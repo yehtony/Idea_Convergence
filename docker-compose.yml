@@ -55,6 +55,9 @@ services:
       - "./frontend/src:/app/src"
     depends_on:
       - backend
+    environment:
+      # Fixes bug where websocket connection is fixed to default port 3000
+      - WDS_SOCKET_PORT=0
 
 volumes:
     db_data:
