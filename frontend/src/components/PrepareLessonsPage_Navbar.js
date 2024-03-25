@@ -119,7 +119,7 @@ export default function PrepareLessonsPage_Navbar() {
     setSelectedModalOpen(false);
   };
 
-  const selectedItemStyle = {
+  const selecteditemstyle = {
     backgroundColor: 'red'
   }
 
@@ -186,7 +186,7 @@ export default function PrepareLessonsPage_Navbar() {
         <List>
           {menuItems.map((menuItem, index) => (
             <div key={menuItem.text}>
-              <ListItem selectedItemStyle={selectedItemStyle} disablePadding sx={{ display: 'block' }}>
+              <ListItem selecteditemstyle={selecteditemstyle} disablePadding sx={{ display: 'block' }}>
                 <Tooltip title={menuItem.text} arrow placement="right">
                   <ListItemButton
                     sx={{
