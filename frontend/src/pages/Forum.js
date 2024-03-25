@@ -92,12 +92,13 @@ export default function Forum() {
           localStorage.setItem('groupId', response.data.data[0].id);
       });
     });
-  
+    getNodes();
   }, []);
 
   const getNodes = async () => {
     try{
       const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${localStorage.getItem('groupId')}`, {
+        
         headers: {
           authorization: 'Bearer JWT Token',
         },
