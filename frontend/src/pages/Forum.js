@@ -69,36 +69,59 @@ export default function Forum() {
     }
   };
 
+  //取得 groupId, 並在其後 render getNodes()
+  const fetchGroupData = async () => {
+    const enterDifferentGroupEndpoint = `${url.backendHost}${config[16].EnterDifferentGroup}${localStorage.getItem('joinCode')}/${localStorage.getItem('userId')}`;
+    const getMyGroupEndpoint = `${url.backendHost}${config[12].getMyGroup}/${localStorage.getItem('activityId')}/${localStorage.getItem('userId')}`;
+  
+    try {
+      const response = await axios.get(enterDifferentGroupEndpoint, {
+        headers: {
+          authorization: 'Bearer JWT Token',
+        },
+      });
+      console.log("1. groupData:response ", response.data.data[0].id);
+      localStorage.setItem('groupId', response.data.data[0].id);
+    } catch (error) {
+      try {
+        const response = await axios.get(getMyGroupEndpoint, {
+          headers: {
+            authorization: 'Bearer JWT Token',
+          },
+        });
+        console.log("1. groupData:response ", response.data.data[0].id);
+        localStorage.setItem('groupId', response.data.data[0].id);
+      } catch (error) {
+        console.error("Error fetching group data", error);
+      }
+    } finally {
+      getNodes();
+    }
+  };
+
   useEffect(() => {
     if (ws) {
       initWebSocket();
     }
 
-    axios.get(`${url.backendHost + config[16].EnterDifferentGroup}${localStorage.getItem('joinCode')}/${localStorage.getItem('userId')}`, {
-      headers: {
-        authorization: 'Bearer JWT Token',
-      },
-    }).then((response) => {
-        console.log("1. groupData:response ", response.data.data[0].id);
-        localStorage.setItem('groupId', response.data.data[0].id);
-    })
-    .catch((error) => {
-      axios.get(`${url.backendHost + config[12].getMyGroup}/${localStorage.getItem('activityId')}/${localStorage.getItem('userId')}`, {
-        headers: {
-          authorization: 'Bearer JWT Token',
-        },
-      }).then((response) => {
-          console.log("1. groupData:response ", response.data.data[0].id);
-          localStorage.setItem('groupId', response.data.data[0].id);
-      });
-    });
-    getNodes();
+    const asyncFn = async () => {
+      await fetchGroupData();
+    };
 
-    location.reload();
+    asyncFn();
+    
   }, []);
 
   const getNodes = async () => {
     try{
+      if(localStorage.getItem('groupId')==null){
+        const asyncFn = async () => {
+          await fetchGroupData();
+        };
+    
+        asyncFn();
+      }
+
       const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${localStorage.getItem('groupId')}`, {
         
         headers: {
