@@ -93,6 +93,8 @@ export default function Forum() {
       });
     });
     getNodes();
+
+    location.reload();
   }, []);
 
   const getNodes = async () => {
