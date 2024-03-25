@@ -271,7 +271,7 @@ export default function Forum() {
         }
       },
       opacity: 1,
-      fix: {
+      fixed: {
         x: true,
         y: true
       },
