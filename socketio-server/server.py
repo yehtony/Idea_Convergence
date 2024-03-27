@@ -20,7 +20,8 @@ async def common(sid, userRq):
     userId = userRq['userId']
     await sio.emit("re-health-check", json.dumps(
         {
-            "userBody": userRq
+            "userBody": userRq,
+            "sid": f"{sid}"
         }
     ), room=sid)
 
