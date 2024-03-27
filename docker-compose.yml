@@ -58,7 +58,14 @@ services:
     environment:
       # Fixes bug where websocket connection is fixed to default port 3000
       - WDS_SOCKET_PORT=0
-
+  websocket-srv:
+    build:
+      context: socketio-server
+    environment:
+      LOG_LEVEL: info
+    restart: always
+    ports:
+        - "3030:3030"
 volumes:
     db_data:
     pgadmin_data:
