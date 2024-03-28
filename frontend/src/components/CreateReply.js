@@ -21,7 +21,7 @@ const scaffold = [
 
 export const CreateReply = ({ open, onClose, nodeContent }) => {
     const name = localStorage.getItem('name');
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState();

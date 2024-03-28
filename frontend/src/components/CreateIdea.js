@@ -50,7 +50,7 @@ const createDecorator = () =>
   ]);
 
 export const CreateIdea = ({ open, onClose }) => {
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const name = localStorage.getItem('name');
     const [editorState, setEditorState] = useState(EditorState.createEmpty(createDecorator()));
     const [loading, setLoading] = useState(false);

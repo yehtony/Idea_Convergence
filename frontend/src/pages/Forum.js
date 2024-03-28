@@ -36,7 +36,11 @@ export default function Forum() {
   const [edges, setEdges] = useState([]);
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
-  const ws = io.connect(url.backendHost);
+  const ws = io.connect(url.socketioHost);
+  ws.on('node-recieve', () => {
+    console.log("node-recieve");
+    getNodes();
+  });
 
   const formatTimestamp = (timestamp) => {
       return new Intl.DateTimeFormat('en-US', {
@@ -174,6 +178,7 @@ export default function Forum() {
         status: 'event02 ok',
       });
     });
+
   };
 
   const graph = {

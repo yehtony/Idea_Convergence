@@ -5,7 +5,7 @@
 const app = require('../app');
 const debug = require('debug')('backend:server');
 const http = require('http');
-const socketServer = require('socket.io');
+// const socketServer = require('socket.io');
 
 /**
  * Get port from environment and store in Express.
@@ -28,13 +28,13 @@ server.listen(port, console.log(`Backend server is running on port ${port}`));
 server.on('error', onError);
 server.on('listening', onListening);
 
-const io = socketServer(server,{
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  },
-}
-);
+// const io = socketServer(server,{
+//   cors: {
+//     origin: "*",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//   },
+// }
+// );
 // io.on("connection", (socket) => {
 //   console.log(`a user connected ${socket.id}`);
   
@@ -42,39 +42,39 @@ const io = socketServer(server,{
 //     socket.broadcast.emit("event02", data);
 //   });
 // });
-global.onlineUsers = new Map();
+// global.onlineUsers = new Map();
 
-io.on("connection", socket => {
-  // console.log(`⚡: ${socket.id} user just connected!`);
-  console.log(socket.connected); 
-  global.chatSocket = socket;
+// io.on("connection", socket => {
+//   // console.log(`⚡: ${socket.id} user just connected!`);
+//   console.log(socket.connected); 
+//   global.chatSocket = socket;
 
-  socket.on('event01', (msg, callback) => {
-    //1
-    console.log("event01", msg);
+//   socket.on('event01', (msg, callback) => {
+//     //1
+//     console.log("event01", msg);
     
-    //2
-    callback({
-      status: "event01 ok"
-    })
+//     //2
+//     callback({
+//       status: "event01 ok"
+//     })
 
-    //3
-    socket.broadcast.emit("event02", "event02 ok", (response) => {
-      console.log("event02 sender status:",response.status); // ok
-    });
-  });
+//     //3
+//     socket.broadcast.emit("event02", "event02 ok", (response) => {
+//       console.log("event02 sender status:",response.status); // ok
+//     });
+//   });
 
-  socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
-  })
+//   socket.on("add-user", (userId) => {
+//     onlineUsers.set(userId, socket.id);
+//   })
 
-  socket.on("create-node", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
-    if(sendUserSocket) {
-      socket.to(sendUserSocket).emit("node-recieve", data.msg);
-    }
-  })
-});
+//   socket.on("create-node", (data) => {
+//     const sendUserSocket = onlineUsers.get(data.to);
+//     if(sendUserSocket) {
+//       socket.to(sendUserSocket).emit("node-recieve", data.msg);
+//     }
+//   })
+// });
 
 
 

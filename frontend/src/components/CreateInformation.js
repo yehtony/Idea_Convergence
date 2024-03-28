@@ -12,7 +12,7 @@ import url from '../url.json';
 
 export const CreateInformation = ({ open, onClose }) => {
     const name = localStorage.getItem('name');
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState();

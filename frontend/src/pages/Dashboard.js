@@ -7,7 +7,7 @@ import ForumPage_Navbar from '../components/ForumPage_Navbar';
 import url from '../url.json';
 
 export default function Dashboard() {
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const [nodes, setNodes] = useState([]);
     const [numberOfTags, setNumberOfTags] = useState([]);
 

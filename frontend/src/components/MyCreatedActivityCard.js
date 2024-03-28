@@ -45,7 +45,7 @@ const ExpandMore = styled((props) => {
 const ITEM_HEIGHT = 48;
 
 export default function MyCreatedActivityCard({ activity }) {
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const navigate = useNavigate();
     const [expanded, setExpanded] = useState(false);
     const [groupData, setGroupData] = useState([]);

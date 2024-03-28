@@ -26,7 +26,7 @@ import url from '../../url.json';
 
 export default function PrepareLessons() {
   const name = localStorage.getItem('name');
-  const ws = io.connect(url.backendHost);
+  const ws = io.connect(url.socketioHost);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(false);

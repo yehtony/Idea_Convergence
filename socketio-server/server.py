@@ -10,6 +10,7 @@ app = tornado.web.Application(
     # ... other application options
 )
 
+onlineUsers = {}
 
 @sio.on("health-check")
 async def common(sid, userRq):
@@ -24,6 +25,28 @@ async def common(sid, userRq):
             "sid": f"{sid}"
         }
     ), room=sid)
+
+@sio.on("event01")
+async def event01(sid, userRq):
+    print(f"event01: {sid}")
+    # Sending a response back to the client
+    await sio.emit("event02", "event02 ok", room=sid)
+
+@sio.on("add-user")
+async def add_user(sid, userId: str):
+    print(f"add_user: {sid}")
+    onlineUsers[userId] = sid
+
+
+@sio.on("create-node")
+async def create_node(sid, userRq):
+    if type(userRq) is not dict:
+        userRq = json.loads(userRq)
+    print(f"recive: common: {userRq}")
+    # targetId = onlineUsers["to"]
+    # onlineUsers[userId] = sid
+    await sio.emit("node-recieve",  "hi")
+
 
 @sio.event
 async def connect(sid, environ, auth):
