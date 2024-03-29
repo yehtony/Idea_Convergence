@@ -406,7 +406,9 @@ export default function Forum() {
   // }
   return (
     <div className="home-container">
-      <ForumPage_Navbar/>
+      <ForumPage_Navbar
+          ws={ws}
+      />
       <div
         id="graph"
         style={{

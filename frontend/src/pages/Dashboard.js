@@ -6,6 +6,7 @@ import io from 'socket.io-client';
 import ForumPage_Navbar from '../components/ForumPage_Navbar';
 import url from '../url.json';
 
+// TODO: Why we need to implement the socket in Dashboard. 
 export default function Dashboard() {
     const ws = io.connect(url.socketioHost);
     const [nodes, setNodes] = useState([]);
@@ -96,7 +97,9 @@ export default function Dashboard() {
 
     return (
       <div className="home-container">
-        <ForumPage_Navbar/>
+        <ForumPage_Navbar
+          ws={ws}
+        />
         <div id="chart"></div>
       </div>
     );

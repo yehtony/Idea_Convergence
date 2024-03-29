@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import user from '../assets/user.png';
 import edit from '../assets/edit.png';
-// import { CreateActivityForm } from './CreateActivityForm';
 import { JoinActivityForm } from './JoinActivityForm';
 
 function stringToColor(string) {
