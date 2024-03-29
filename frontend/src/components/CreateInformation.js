@@ -7,12 +7,10 @@ import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { sendMessage } from '../utils/socketTool';
-import io from 'socket.io-client';
 import url from '../url.json';
 
-export const CreateInformation = ({ open, onClose }) => {
+export const CreateInformation = ({ open, onClose, ws }) => {
     const name = localStorage.getItem('name');
-    const ws = io.connect(url.socketioHost);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState();

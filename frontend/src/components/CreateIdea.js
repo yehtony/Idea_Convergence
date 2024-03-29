@@ -7,7 +7,7 @@ import { EditorState, ContentState, CompositeDecorator } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { sendMessage } from '../utils/socketTool';
-import io from 'socket.io-client';
+
 import url from '../url.json';
 
 const scaffold = [
@@ -49,8 +49,7 @@ const createDecorator = () =>
     }
   ]);
 
-export const CreateIdea = ({ open, onClose }) => {
-    const ws = io.connect(url.socketioHost);
+export const CreateIdea = ({ open, onClose, ws }) => {
     const name = localStorage.getItem('name');
     const [editorState, setEditorState] = useState(EditorState.createEmpty(createDecorator()));
     const [loading, setLoading] = useState(false);

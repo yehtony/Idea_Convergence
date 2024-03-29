@@ -263,18 +263,21 @@ export default function ForumPage_Navbar({ ws }) {
         <CreateIdea
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createQuestion' && (
         <CreateQuestion
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createInformation' && (
         <CreateInformation
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createFlask' && (
@@ -288,6 +291,7 @@ export default function ForumPage_Navbar({ ws }) {
         <CreateNote
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createLearningFeedback' && (
