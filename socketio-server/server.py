@@ -46,10 +46,23 @@ async def create_node(sid, userRq):
 
     if "activityId" not in userRq:
         await sio.emit("node-recieve",  userRq)
-        return "done-1"
+        return "node-done-1"
 
     await sio.emit(f"node-recieve-{userRq['activityId']}",  userRq)
-    return "done-2"
+    return "node-done-2"
+
+@sio.on("create-edge")
+async def create_edge(sid, userRq):
+    if type(userRq) is not dict:
+        userRq = json.loads(userRq)
+    print(f"recive: common: {userRq}")
+
+    if "activityId" not in userRq:
+        await sio.emit("edge-recieve",  userRq)
+        return "edge-done-1"
+
+    await sio.emit(f"edge-recieve-{userRq['activityId']}",  userRq)
+    return "edge-done-2"
 
 
 @sio.event

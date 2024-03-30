@@ -15,3 +15,11 @@ export const sendNewNodeMessage = (ws, node) => {
     console.log("event01 sender status: ", response);
   });
 };
+
+export const sendNewEdgeMessage = (ws, edge) => {
+  console.log("[SOCKET] sendNewEdgeMessage: ", edge);
+
+  ws.emit('create-edge', edge, (response) => {
+    console.log("event01 sender status: ", response);
+  });
+};

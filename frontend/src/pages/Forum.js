@@ -186,6 +186,12 @@ export default function Forum() {
         getNodes();
       }
     });
+    ws.on(`edge-recieve-${activityId}`, (body) => {
+      console.log(`edge-recieve:activityId:${activityId} -> `,body);
+      if(body.groupId==localStorage.getItem('groupId')){
+        getNodes();
+      }
+    });
 
   };
 
@@ -430,7 +436,7 @@ export default function Forum() {
       >
         <Graph graph={graph} options={options} events={events}/>
       </div> 
-      <ViewNode open={open} onClose={handleClose} nodeContent={nodeContent} />
+      <ViewNode open={open} onClose={handleClose} nodeContent={nodeContent} ws={ws}/>
     </div>
   );
 }
