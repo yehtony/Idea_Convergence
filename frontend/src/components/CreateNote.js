@@ -11,14 +11,14 @@ export const CreateNote = ({ open, onClose, ws }) => {
     const name = localStorage.getItem('name');
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [loading, setLoading] = useState(false);
-    const [content, setContent] = useState();
-    const [data, setData] = useState({
+    const nodeDefault = {
       title: "",
-      content: content,
+      content: "",
       tags: "record",
       author: name,
       groupId: localStorage.getItem('groupId')
-    });
+    }
+    const [data, setData] = useState(nodeDefault);
     const onEditorStateChange = function (editorState) {
       setEditorState(editorState);
       let content = editorState.getCurrentContent().getPlainText("\u0001");
@@ -61,13 +61,8 @@ export const CreateNote = ({ open, onClose, ws }) => {
         await newNode(ideaData, localStorage.getItem('activityId'),ws);
         onClose(onClose);
         setLoading(false);
-        setData({
-          title: "",
-          content: "",
-          tags: "",
-          author: "",
-          groupId: ""
-        })
+        setData(nodeDefault);
+        setEditorState(EditorState.createEmpty());
       }
       catch(error){
           if (error.response) {
