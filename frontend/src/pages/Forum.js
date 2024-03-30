@@ -101,12 +101,11 @@ export default function Forum() {
   };
 
   useEffect(() => {
-    if (ws) {
-      initWebSocket();
-    }
-
     const asyncFn = async () => {
       await fetchGroupData();
+      if (ws) {
+        initWebSocket();
+      }
     };
 
     asyncFn();
@@ -183,7 +182,9 @@ export default function Forum() {
     console.log(`node-recieve:  node-recieve-${activityId}`);
     ws.on(`node-recieve-${activityId}`, (body) => {
       console.log(`node-recieve:activityId:${activityId} -> `,body);
-      getNodes();
+      if(body.groupId==localStorage.getItem('groupId')){
+        getNodes();
+      }
     });
 
   };
