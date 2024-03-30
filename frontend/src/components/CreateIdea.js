@@ -1,14 +1,10 @@
-import config from '../config.json';
-import axios from "axios";
 import React, { useState } from 'react';
 import { Button, ButtonGroup, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormHelperText, TextField, InputLabel, Box } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { EditorState, ContentState, CompositeDecorator } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { sendMessage } from '../utils/socketTool';
-
-import url from '../url.json';
+import { newNode } from '../utils/ideaTool';
 
 const scaffold = [
   <Button key="1">【💡我的想法】</Button>,
@@ -100,58 +96,51 @@ export const CreateIdea = ({ open, onClose, ws }) => {
       setEditorState(newEditorState);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
       const isTitleValid = data.title.trim().length > 0;
       const titleValidLength = data.title.trim().length < 15;
       if(
-        isTitleValid && 
-        titleValidLength &&
-        editorState.getCurrentContent().hasText() &&
-        editorState.getCurrentContent().getPlainText().length > 0
+        !isTitleValid || 
+        !titleValidLength || 
+        !editorState.getCurrentContent().hasText() || 
+        !editorState.getCurrentContent().getPlainText().length > 0
       ) {
-        const ideaData = {
-          title: data.title,
-          content: data.content,
-          tags: data.tags,
-          author: data.author,
-          groupId: data.groupId
-        };
-      
-        setLoading(true);
-        
-        axios
-            .post(url.backendHost + config[7].createNode, ideaData)
-            .then((response) => {
-                onClose(onClose);
-                setLoading(false);
-                setData({
-                  title: "",
-                  content: "",
-                  tags: "",
-                  author: "",
-                  groupId: ""
-                })
-                console.log(response.status, response.data);
-                console.log("1",typeof ws);
-                sendMessage(ws);
-            })
-            .catch((error) => {
-                if (error.response) {
-                    console.log(error.response);
-                    console.log("server responded");
-                    setLoading(false);
-                } else if (error.request) {
-                    console.log("network error");
-                    setLoading(false);
-                } else {
-                    console.log(error);
-                    setLoading(false);
-                }
-            });
-      } else {
         return alert("請確定以下項目： \n1. 標題及內容都已輸入\n2. 標題長度不超過15個字");
       }
+      const ideaData = {
+        title: data.title,
+        content: data.content,
+        tags: data.tags,
+        author: data.author,
+        groupId: data.groupId
+      };
+      setLoading(true);
+      try {
+        await newNode(ideaData, localStorage.getItem('activityId'),ws);
+        onClose(onClose);
+        setLoading(false);
+        setData({
+          title: "",
+          content: "",
+          tags: "",
+          author: "",
+          groupId: ""
+        })
+      }
+      catch(error){
+          if (error.response) {
+              console.log(error.response);
+              console.log("server responded");
+              setLoading(false);
+          } else if (error.request) {
+              console.log("network error");
+              setLoading(false);
+          } else {
+              console.log(error);
+              setLoading(false);
+          }
+      }; 
     };
 
     return (
