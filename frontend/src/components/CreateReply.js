@@ -19,10 +19,9 @@ const scaffold = [
 
 export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
     const name = localStorage.getItem('name');
-    const [content, setContent] = useState();
     const nodeDefault = {
       title: "",
-      content: content,
+      content: "",
       tags: "reply",
       author: name,
       groupId: localStorage.getItem('groupId')
@@ -106,7 +105,8 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
         //
         onClose(onClose);
         setLoading(false);
-        setData(nodeDefault)
+        setData(nodeDefault);
+        setEditorState(EditorState.createEmpty());
       }
       catch(error){
           if (error.response) {
