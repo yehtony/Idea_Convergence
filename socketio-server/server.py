@@ -43,9 +43,13 @@ async def create_node(sid, userRq):
     if type(userRq) is not dict:
         userRq = json.loads(userRq)
     print(f"recive: common: {userRq}")
-    # targetId = onlineUsers["to"]
-    # onlineUsers[userId] = sid
-    await sio.emit("node-recieve",  "hi")
+
+    if "activityId" not in userRq:
+        await sio.emit("node-recieve",  userRq)
+        return "done-1"
+
+    await sio.emit(f"node-recieve-{userRq['activityId']}",  userRq)
+    return "done-2"
 
 
 @sio.event

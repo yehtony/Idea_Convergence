@@ -37,7 +37,7 @@ export default function Forum() {
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
   const ws = io.connect(url.socketioHost);
-  
+  const activityId = localStorage.getItem('activityId')
 
   const formatTimestamp = (timestamp) => {
       return new Intl.DateTimeFormat('en-US', {
@@ -168,16 +168,21 @@ export default function Forum() {
       getNodes();
     });
 
-    ws.on('event02', (arg, callback) => {
-      console.log("WebSocket event02", arg);
-      getNodes();
-      callback({
-        status: 'event02 ok',
-      });
-    });
+    // ws.on('event02', (arg, callback) => {
+    //   console.log("WebSocket event02", arg);
+    //   getNodes();
+    //   callback({
+    //     status: 'event02 ok',
+    //   });
+    // });
 
-    ws.on('node-recieve', () => {
-      console.log("node-recieve");
+    // ws.on('node-recieve', (body) => {
+    //   console.log("node-recieve:body -> ",body);
+    //   getNodes();
+    // });
+    console.log(`node-recieve:  node-recieve-${activityId}`);
+    ws.on(`node-recieve-${activityId}`, (body) => {
+      console.log(`node-recieve:activityId:${activityId} -> `,body);
       getNodes();
     });
 
