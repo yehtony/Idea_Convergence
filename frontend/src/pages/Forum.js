@@ -52,6 +52,7 @@ export default function Forum() {
   };
 
   const handleClickOpen = (nodeId) => {
+    setNodeContent(null);
     setOpen(true);
     fetchNodeData(nodeId);
   };
