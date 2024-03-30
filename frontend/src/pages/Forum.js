@@ -9,14 +9,15 @@ import url from '../url.json';
 import {genEdge, genNode} from "../utils/ideaTool";
 
 
-
-
 export default function Forum() {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [graph, setGraph] = useState({
+    nodes: [],
+    edges: [],
+  });
+
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
-  const ws = io.connect(url.socketioHost);
+  const [ws, setSocket] = useState(null);
   const activityId = localStorage.getItem('activityId')
 
 
@@ -66,21 +67,49 @@ export default function Forum() {
         console.error("Error fetching group data", error);
       }
     } finally {
-      getNodes();
+      await getNodes();
     }
   };
+  useEffect(() => {
+    async function fetchData() {
+      await fetchGroupData();
+      setSocket(io.connect(url.socketioHost));
+    }
+    fetchData();
+    
+
+  },[]);
+
 
   useEffect(() => {
-    const asyncFn = async () => {
-      await fetchGroupData();
-      if (ws) {
-        initWebSocket();
-      }
-    };
-
-    asyncFn();
+    if(ws){
+      console.log("initWebSocket");
+      ws.on('connect', () => {
+        console.log("WebSocket connected");
+      });
+  
+      ws.on(`node-recieve-${activityId}`, (body) => {
+        if(body.groupId==localStorage.getItem('groupId')){
+          setGraph(graph => ({
+            nodes: [...graph.nodes,genNode(body)],
+            edges: graph.edges,
+          }));
+        }
+      });
+      ws.on(`edge-recieve-${activityId}`, (body) => {
+        if(body.groupId==localStorage.getItem('groupId')){
+          setGraph(graph =>({
+            nodes: graph.nodes,
+            edges: [...graph.edges,genEdge(body)]
+          }));
+          
+        }
+      });
+    }
     
-  }, []);
+
+    
+  }, [ws]);
 
   const getNodes = async () => {
     if(localStorage.getItem('groupId')==null){
@@ -104,52 +133,23 @@ export default function Forum() {
       },
     });
 
-    // console.log("fetchData: ", fetchData);
+    console.log("fetchData: ", fetchData);
     // console.log("fetchEdge: ", fetchEdge);
 
     const nodeData = fetchData.data[0].Nodes.map((node) => genNode(node));
 
     const edgeData = fetchEdge.data.map((edge) => genEdge(edge));
 
-    // console.log('nodeData: ', nodeData);
-    // console.log('edgeData: ', edgeData);
-    setNodes(nodeData);
-    setEdges(edgeData);
-    console.log(`getNodes:  -> `,graph.node);
+    console.log('nodeData: ', nodeData);
+    console.log('edgeData: ', edgeData);
     localStorage.setItem("nodeDataLength", nodeData.length + 1);
-
-  };
-
-  const initWebSocket = () => {
-    ws.on('connect', () => {
-      // console.log("WebSocket connected");
-    });
-
-    // console.log(`node-recieve:  node-recieve-${activityId}`);
-    ws.on(`node-recieve-${activityId}`, (body) => {
-      // console.log(`node-recieve:activityId:${activityId} -> `,body);
-      if(body.groupId==localStorage.getItem('groupId')){
-        console.log(`node-recieve:activityId:${activityId}:nodes -> `,graph.nodes);
-        graph.nodes.push(genNode(body));
-        setNodes(graph.nodes);
-        localStorage.setItem("nodeDataLength", nodes.length + 1);
-      }
-    });
-    ws.on(`edge-recieve-${activityId}`, (body) => {
-      // console.log(`edge-recieve:activityId:${activityId} -> `,body);
-      if(body.groupId==localStorage.getItem('groupId')){
-        console.log(`edge-recieve:activityId:${activityId} -> `,graph.edges);
-        graph.edges.push(genEdge(body));
-        setEdges(graph.edges);
-      }
+    setGraph({
+      nodes: nodeData,
+      edges: edgeData,
     });
 
   };
 
-  let graph = {
-    nodes: nodes,
-    edges: edges,
-  };
 
   const options = {
     layout: {
@@ -165,8 +165,25 @@ export default function Forum() {
       },
     },
     interaction: {
-      navigationButtons: true,
-      tooltipDelay: 300
+        navigationButtons: true,
+        dragNodes:true,
+        dragView: true,
+        hideEdgesOnDrag: false,
+        hideEdgesOnZoom: false,
+        hideNodesOnDrag: false,
+        hover: false,
+        hoverConnectedEdges: true,
+        keyboard: {
+          enabled: false,
+          speed: {x: 10, y: 10, zoom: 0.02},
+          bindToWindow: true
+        },
+        multiselect: false,
+        selectable: true,
+        selectConnectedEdges: true,
+        tooltipDelay: 300,
+        zoomSpeed: 1,
+        zoomView: true
     },
     clickToUse: false,
     groups: {
@@ -355,18 +372,15 @@ export default function Forum() {
 
   const events = {
     click: (event) => {
-      var { nodes, edges, items } = event;
-      // console.log('click~', nodes);
-      // console.log('click~', event);
-      if (nodes.length === 1) {
-        handleClickOpen(nodes[0]);
-        localStorage.setItem('nodeId', nodes[0]);
+      // console.log(`events:`,event);
+      // console.log(`events:targetNodes`,event.nodes);
+      if (event.nodes.length === 1) {
+        handleClickOpen(event.nodes[0]);
+        localStorage.setItem('nodeId', event.nodes[0]);
       }
     }
   };
-  // if(document.getElementById("graph")){
-  //   document.getElementById("graph").click();
-  // }
+
   return (
     <div className="home-container">
       <ForumPage_Navbar
