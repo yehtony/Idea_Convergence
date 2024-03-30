@@ -33,7 +33,7 @@ const db = require("../models");
 
    next();
  } catch (error) {
-   console.log(error);
+   // console.log(error);
  }
 };
 

@@ -16,9 +16,9 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 
 //checking if connection is done
 sequelize.authenticate().then(() => {
-    console.log(`Database connected to discover~`)
+    // console.log(`Database connected to discover~`)
 }).catch((err) => {
-    console.log(err)
+    // console.log(err)
 })
 
 const db = {};

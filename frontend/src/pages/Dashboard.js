@@ -27,7 +27,7 @@ export default function Dashboard() {
             },
           });
 
-          console.log("fetchData: ", fetchData.data[0].Nodes);
+          // console.log("fetchData: ", fetchData.data[0].Nodes);
           setNodes(fetchData.data[0].Nodes);
         } catch (error) {
           console.error('Error fetching nodes:', error.message);
@@ -63,12 +63,12 @@ export default function Dashboard() {
   
     const initWebSocket = () => {
       ws.on('connect', () => {
-        console.log("WebSocket connected");
+        // console.log("WebSocket connected");
         getNodes();
       });
 
       ws.on('event02', (arg, callback) => {
-        console.log("WebSocket event02", arg);
+        // console.log("WebSocket event02", arg);
         getNodes();
         callback({
           status: 'event02 ok',

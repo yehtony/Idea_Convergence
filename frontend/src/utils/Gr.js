@@ -14,13 +14,13 @@ export default function Gr(props) {
         graph={props.graph}
         options={options}
         getNetwork={(network) => {
-          console.log(network);
+          // console.log(network);
           // network.clustering.clusterByHubsize(5);
 
           // network.clustering.cluster({
           //   joinCondition: function (nodeOptions) {
           //     if (nodeOptions.cid === 1) {
-          //       console.log("nodeOptions", nodeOptions);
+          //       // console.log("nodeOptions", nodeOptions);
           //     }
           //     return nodeOptions.cid === 1;
           //   }

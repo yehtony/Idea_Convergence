@@ -26,7 +26,7 @@ export const CreateNote = ({ open, onClose, ws }) => {
         ...data,
         content: content,
       });
-      console.log("content: ", content);
+      // console.log("content: ", content);
     };
 
     const handleChange = (e) => {
@@ -66,14 +66,14 @@ export const CreateNote = ({ open, onClose, ws }) => {
       }
       catch(error){
           if (error.response) {
-              console.log(error.response);
-              console.log("server responded");
+              // console.log(error.response);
+              // console.log("server responded");
               setLoading(false);
           } else if (error.request) {
-              console.log("network error");
+              // console.log("network error");
               setLoading(false);
           } else {
-              console.log(error);
+              // console.log(error);
               setLoading(false);
           }
       }; 

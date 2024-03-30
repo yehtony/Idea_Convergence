@@ -52,12 +52,12 @@ export const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Hi")
+        // console.log("Hi")
         const userData = {
             email: data.email,
             password: data.password
         };
-        console.log("userData: ", userData)
+        // console.log("userData: ", userData)
         await axios
             .post(url.backendHost + config[1].loginUrl, userData)
             .then((response) => {
@@ -79,16 +79,16 @@ export const Login = () => {
                 localStorage.setItem('name', response.data.name);
                 localStorage.setItem('email', response.data.email);
 
-                console.log("res: ", response.data)
+                // console.log("res: ", response.data)
             })
             .catch((error) => {
                 if (error.response) {
-                    console.log(error.response);
-                    console.log("server responded");
+                    // console.log(error.response);
+                    // console.log("server responded");
                 } else if (error.request) {
-                    console.log("network error");
+                    // console.log("network error");
                 } else {
-                    console.log(error);
+                    // console.log(error);
                 }
             });
     };

@@ -39,20 +39,20 @@ exports.signup = async (req, res) => {
       });
  
       res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
-      console.log("user", JSON.stringify(user, null, 2));
-      console.log(token);
+      // console.log("user", JSON.stringify(user, null, 2));
+      // console.log(token);
       //send users details
       return res.status(201).send(user);
     } else {
       return res.status(409).send("Details are not correct");
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
 exports.batchRegistration = async (req, res) => {
-  console.log(req.file);
+  // console.log(req.file);
   try {
     if (req.file == undefined) {
       return res.status(400).send("Please upload an excel file!");
@@ -67,7 +67,7 @@ exports.batchRegistration = async (req, res) => {
     let users = [];
 
     for (const row of rows) {
-      console.log(row);
+      // console.log(row);
       const hashedPassword = await bcrypt.hash(row[2], 10);
       let user = {
         name: row[0],
@@ -76,16 +76,16 @@ exports.batchRegistration = async (req, res) => {
         school: row[3],
         city: row[4],
       };
-      console.log(hashedPassword);
+      // console.log(hashedPassword);
       users.push(user);
-      console.log("Users: ", users);
+      // console.log("Users: ", users);
     }
 
     
     let profiles = [];
     await User.bulkCreate(users)
       .then(async (createdUsers) => {
-        console.log("data: ", createdUsers);
+        // console.log("data: ", createdUsers);
         for (let i = 0; i < createdUsers.length; i++) {
           let profile = {
             userId: createdUsers[i].dataValues.id,
@@ -94,15 +94,15 @@ exports.batchRegistration = async (req, res) => {
             year: rows[i][7],
             sex: rows[i][8],
           };
-          console.log("profile: ", profile);
+          // console.log("profile: ", profile);
           profiles.push(profile);
-          console.log("profiles: ", profiles, profiles.length);
+          // console.log("profiles: ", profiles, profiles.length);
         }
-        console.log("✨pro: ", profiles);
+        // console.log("✨pro: ", profiles);
 
         await Profile.bulkCreate(profiles)
           .then(async (createdProfiles) => {
-            console.log("😳😳😳: ", createdProfiles);
+            // console.log("😳😳😳: ", createdProfiles);
             for (let i = 0; i < createdProfiles.length; i++) {
               UserProfile.create({
                 UserId: createdUsers[i].dataValues.id,
@@ -150,29 +150,29 @@ exports.login = async (req, res) => {
     }
 
     const isSame = await bcrypt.compare(password, user.password);
-    console.log('1')
+    // console.log('1')
     //if password is the same
       //generate token with the user's id and the secretKey in the env file
 
     if (!isSame) {
       return res.status(401).send("Authentication failed");
     }
-    console.log('2')
+    // console.log('2')
     let token = jwt.sign({ id: user.id }, process.env.secretKey, {
       expiresIn: 1 * 24 * 60 * 60 * 1000,
     });
 
-    console.log('3')
+    // console.log('3')
     //if password matches wit the one in the database
     //go ahead and generate a cookie for the user
     res.cookie("jwt", token, { maxAge: 1 * 24 * 60 * 60, httpOnly: true });
-    console.log("user", JSON.stringify(user, null, 2));
-    console.log(token);
+    // console.log("user", JSON.stringify(user, null, 2));
+    // console.log(token);
     //send user data
     return res.status(200).send(user);
 
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 

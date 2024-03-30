@@ -27,7 +27,7 @@ exports.joinGroup = async (req, res) => {
             return res.status(404).send({ message: 'Group not found.' });
         }
 
-        console.log("ActivityGroupId: ", group.id)
+        // console.log("ActivityGroupId: ", group.id)
         await UserActivityGroup.bulkCreate([{
             UserId: userId,
             ActivityGroupId: group.id
@@ -102,7 +102,7 @@ exports.findMyGroupMember = (req, res) => {
             }
         })
         .then((data) => {
-            console.log("👇", data[0].dataValues.userId);
+            // console.log("👇", data[0].dataValues.userId);
             if (data[0].dataValues.userId) {
                 User.findAll({
                     where: {
@@ -134,7 +134,7 @@ exports.findMyGroup = (req, res) => {
         }
     })
     .then((data) => {
-        console.log("👇", data);
+        // console.log("👇", data);
         res.status(200).send({
             success: true,
             message: "Groups found successfully.",
@@ -160,7 +160,7 @@ exports.EnterDifferentGroup = (req, res) => {
         }
     })
     .then((data) => {
-        console.log("👇", data);
+        // console.log("👇", data);
         res.status(200).send({
             success: true,
             message: "Groups found successfully.",

@@ -87,11 +87,11 @@ export default function MyCreatedActivityCard({ activity }) {
 
     const initWebSocket = () => {
       ws.on('connect', () => {
-        console.log("WebSocket connected");
+        // console.log("WebSocket connected");
       });
     
       ws.on('event02', (arg, callback) => {
-        console.log("WebSocket event02", arg);
+        // console.log("WebSocket event02", arg);
         callback({
           status: 'event02 ok',
         });
@@ -111,10 +111,10 @@ export default function MyCreatedActivityCard({ activity }) {
               authorization: 'Bearer JWT Token',
             },
           });
-          console.log("GroupData: ", fetchData.data.Groups);
+          // console.log("GroupData: ", fetchData.data.Groups);
           setGroupData(fetchData.data.Groups);
         } catch (err) {
-          console.log(err);
+          // console.log(err);
         }
     };
   
@@ -156,7 +156,7 @@ export default function MyCreatedActivityCard({ activity }) {
 
           try {
               const createGroupResponse = await axios.post(url.backendHost + config[14].creatGroup, groupData);
-              console.log(createGroupResponse.status, createGroupResponse.data);
+              // console.log(createGroupResponse.status, createGroupResponse.data);
               sendMessage(ws);
 
               const activityData = {
@@ -168,21 +168,21 @@ export default function MyCreatedActivityCard({ activity }) {
                   activityData
               );
 
-              console.log(joinGroupResponse.status, joinGroupResponse.data);
+              // console.log(joinGroupResponse.status, joinGroupResponse.data);
               window.location.reload(false);
           } catch (error) {
               if (error.response) {
-                  console.log(error.response);
-                  console.log("server responded");
+                  // console.log(error.response);
+                  // console.log("server responded");
               } else if (error.request) {
-                  console.log("network error");
+                  // console.log("network error");
               } else {
-                  console.log(error);
+                  // console.log(error);
               }
           }
       })
       .catch((error) => {
-          console.log(error);
+          // console.log(error);
       });
     }
 
@@ -195,16 +195,16 @@ export default function MyCreatedActivityCard({ activity }) {
           authorization: 'Bearer JWT Token',
         },
       }).then((response) => {
-          console.log("groupData:response ", response.data.data[0].id);
+          // console.log("groupData:response ", response.data.data[0].id);
       })
       .catch((error) => {
           if (error.response) {
-              console.log(error.response);
-              console.log("server responded");
+              // console.log(error.response);
+              // console.log("server responded");
           } else if (error.request) {
-              console.log("network error");
+              // console.log("network error");
           } else {
-              console.log(error);
+              // console.log(error);
           }
       });
 

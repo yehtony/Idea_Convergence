@@ -14,13 +14,13 @@ exports.create = async (req, res) => {
             to: to
         });
 
-        console.log('Created edge:', edge);
+        // console.log('Created edge:', edge);
         res.status(200).send({
             message: 'Edge created successfully',
             edge: edge
         });
     } catch (err) {
-        console.log('Error while creating edge:', err);
+        // console.log('Error while creating edge:', err);
         res.status(500).send({
             message: 'Error while creating edge',
             error: err.message

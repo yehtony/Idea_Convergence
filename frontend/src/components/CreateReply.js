@@ -38,7 +38,7 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
         ...data,
         content: content,
       });
-      console.log("content: ", content);
+      // console.log("content: ", content);
     };
 
     const handleChange = (e) => {
@@ -93,7 +93,7 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
       setLoading(true);
       try {
         const responseFromPostNode = await newNode(ideaData, localStorage.getItem('activityId'),ws);
-        console.log(`CreateIdea:responseFromPostNode.data: ${responseFromPostNode.data}`)
+        // console.log(`CreateIdea:responseFromPostNode.data: ${responseFromPostNode.data}`)
         const edgeData = {
           groupId: localStorage.getItem('groupId'),
           from: responseFromPostNode.data.node.id,
@@ -110,14 +110,14 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
       }
       catch(error){
           if (error.response) {
-              console.log(error.response);
-              console.log("server responded");
+              // console.log(error.response);
+              // console.log("server responded");
               setLoading(false);
           } else if (error.request) {
-              console.log("network error");
+              // console.log("network error");
               setLoading(false);
           } else {
-              console.log(error);
+              // console.log(error);
               setLoading(false);
           }
       }; 
@@ -180,7 +180,10 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
                     key={index}
                     editorState={editorState}
                     onEditorStateChange={onEditorStateChange}
-                    onClick={() => {handleButtonClick(button.props.children); console.log(button.props.children)}}
+                    onClick={() => {
+                      handleButtonClick(button.props.children); 
+                      // console.log(button.props.children)
+                    }}
                   >
                     {button.props.children}
                   </Button>

@@ -41,7 +41,7 @@ export default function IndexOfTeacher() {
         });
         setActivities(fetchData.data);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
     getActivities();
@@ -53,11 +53,11 @@ export default function IndexOfTeacher() {
 
   const initWebSocket = () => {
     ws.on('connect', () => {
-      console.log(ws.id);
+      // console.log(ws.id);
     });
 
     ws.on('event02', (arg, callback) => {
-      console.log(arg);
+      // console.log(arg);
       callback({
         status: 'event02 ok',
       });

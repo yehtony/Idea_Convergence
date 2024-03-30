@@ -49,20 +49,20 @@ export default function PrepareLessons() {
           authorization: 'Bearer JWT Token',
         },
       });
-      console.log('GroupData: ', fetchData.data.Groups);
+      // console.log('GroupData: ', fetchData.data.Groups);
       setGroupData(fetchData.data.Groups);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
   const initWebSocket = () => {
     ws.on('connect', () => {
-      console.log('WebSocket connected');
+      // console.log('WebSocket connected');
     });
 
     ws.on('event02', (arg, callback) => {
-      console.log('WebSocket event02', arg);
+      // console.log('WebSocket event02', arg);
       callback({
         status: 'event02 ok',
       });
@@ -98,7 +98,7 @@ export default function PrepareLessons() {
       ...data,
       content: content,
     });
-    console.log('content: ', content);
+    // console.log('content: ', content);
   };
 
   const handleChange = (e) => {
@@ -149,13 +149,13 @@ export default function PrepareLessons() {
           selectedGroups.map(async (groupId) => {
             ideaData.groupId = groupId;
             const response = await axios.post(url.backendHost + config[7].createNode, ideaData);
-            console.log(response.status, response.data);
+            // console.log(response.status, response.data);
           })
         );
 
         setLoading(false);
         resetForm(); // Reset the form after successful submission
-        console.log('4', typeof ws);
+        // console.log('4', typeof ws);
         sendMessage(ws);
       } catch (error) {
         console.error('Error:', error);
