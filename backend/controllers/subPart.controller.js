@@ -22,13 +22,13 @@ exports.create = async (req, res) => {
             ActivityPartId: partId
         })
 
-        console.log('Created SubPart:', subPart);
+        // console.log('Created SubPart:', subPart);
         res.status(200).send({
             message: 'SubPart created successfully',
             part: subPart
         });
     } catch (err) {
-        console.log('Error while creating SubPart:', err);
+        // console.log('Error while creating SubPart:', err);
         res.status(500).send({
             message: 'Error while creating SubPart',
             error: err.message
@@ -46,7 +46,7 @@ exports.cloneSubPart = (req, res) => {
     .then(data => {
         delete data.id;
         SubPart.create(data);
-        console.log('data: ', data)
+        // console.log('data: ', data)
         res.status(200).send(data);
     }).catch((err) => {
         res.status(400).send({

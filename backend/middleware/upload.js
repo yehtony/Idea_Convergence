@@ -2,7 +2,7 @@ const multer = require("multer");
 
 
 const excelFilter = (req, file, cb) => {
-    console.log("😳");
+    // console.log("😳");
     if (!file.originalname.match(/\.(xlsx|xls)$/)) {
         cb(new Error('Please upload an Excel'))
     }
@@ -12,12 +12,12 @@ const excelFilter = (req, file, cb) => {
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, __basedir + "/uploads/");
-        console.log(__basedir + "/uploads/");
+        // console.log(__basedir + "/uploads/");
     },
     filename: (req, file, cb) => {
-        console.log(file.originalname);
+        // console.log(file.originalname);
         cb(null, file.originalname + '-' + Date.now());
-        console.log("👍");
+        // console.log("👍");
     },
 });
 

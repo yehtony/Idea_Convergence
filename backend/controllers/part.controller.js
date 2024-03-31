@@ -21,13 +21,13 @@ exports.create = async (req, res) => {
             PartId: part.id
         })
 
-        console.log('Created part:', part);
+        // console.log('Created part:', part);
         res.status(200).send({
             message: 'Part created successfully',
             part: part
         });
     } catch (err) {
-        console.log('Error while creating part:', err);
+        // console.log('Error while creating part:', err);
         res.status(500).send({
             message: 'Error while creating part',
             error: err.message
@@ -108,7 +108,7 @@ exports.clonePart = (req, res) => {
     .then(data => {
         delete data.id;
         Part.create(data);
-        console.log('data: ', data)
+        // console.log('data: ', data)
         res.status(200).send(data);
     }).catch((err) => {
         res.status(400).send({

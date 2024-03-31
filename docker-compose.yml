@@ -8,6 +8,7 @@ services:
       DB_USERNAME: wulab #<USERNAME>
       DB_USERPSW: ytwu35415 #<USERPSW>
       DB_HOST: db
+      NODE_ENV: production
     restart: always
     volumes:
       - "./uploads:/app/uploads/"
@@ -32,6 +33,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:7.5
+    user: root
     container_name: pgadmin4_container
     restart: always
     ports:
@@ -41,8 +43,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
       PGADMIN_LISTEN_PORT: 5050
       PGADMIN_CONFIG_WTF_CSRF_CHECK_DEFAULT: "False"
-    volumes:
-      - "./pgadmin_data:/var/lib/pgadmin"
+    depends_on:
+      - db
 
   frontend:
     build: 
@@ -55,10 +57,19 @@ services:
       - "./frontend/src:/app/src"
     depends_on:
       - backend
+      - websocket-srv
     environment:
       # Fixes bug where websocket connection is fixed to default port 3000
       - WDS_SOCKET_PORT=0
-
+      - NODE_ENV=production
+  websocket-srv:
+    build:
+      context: socketio-server
+    environment:
+      LOG_LEVEL: info
+    restart: always
+    ports:
+        - "3030:3030"
 volumes:
     db_data:
     pgadmin_data:

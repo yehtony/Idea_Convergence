@@ -129,7 +129,7 @@ export default function PrepareLessonsPage_Navbar() {
         const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${localStorage.getItem('activityId')}`);
         setActivityData(response.data);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
 

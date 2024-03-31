@@ -20,9 +20,9 @@ exports.create = async (req, res) => {
     activity
         .save()
         .then((data) => {
-            console.log('data: ', data)
+            // console.log('data: ', data)
             res.send(data);
-            console.log("Create activity success~🎉")
+            // console.log("Create activity success~🎉")
         })
         .catch((err) => {
             res.status(500).send({
@@ -50,13 +50,13 @@ exports.createOneGroupForActivity = async (req, res) => {
             GroupId: group.id
         })
 
-        console.log('Created group:', group);
+        // console.log('Created group:', group);
         res.status(200).send({
             message: 'Group created successfully',
             group: group
         });
     } catch (err) {
-        console.log('Error while creating group:', err);
+        // console.log('Error while creating group:', err);
         res.status(500).send({
             message: 'Error while creating group',
             error: err.message
@@ -88,13 +88,13 @@ exports.createGroupsForActivity = async (req, res) => {
             }])
         }
 
-        console.log('Created groups:', createdGroups);
+        // console.log('Created groups:', createdGroups);
         res.status(200).send({
             message: 'Groups created successfully',
             groups: createdGroups
         });
     } catch (err) {
-        console.log('Error while creating groups:', err);
+        // console.log('Error while creating groups:', err);
         res.status(500).send({
             message: 'Error while creating groups',
             error: err.message
@@ -118,7 +118,7 @@ exports.findMyActivity = (req, res) => {
             ]
         })
         .then((data) => {
-            console.log('data: ', data)
+            // console.log('data: ', data)
             res.status(200).send(data);
         }).catch((err) => {
             res.status(400).send({
@@ -175,7 +175,7 @@ exports.getJoinedActivitiesByUserId = (req, res) => {
             ]
         })
         .then((data) => {
-            console.log('data: ', data);
+            // console.log('data: ', data);
             res.status(200).send(data);
         }).catch((err) => {
             res.status(400).send({
@@ -195,7 +195,7 @@ exports.cloneActivity = (req, res) => {
     .then(data => {
         delete data.id;
         Activity.create(data);
-        console.log('data: ', data)
+        // console.log('data: ', data)
         res.status(200).send(data);
     }).catch((err) => {
         res.status(400).send({

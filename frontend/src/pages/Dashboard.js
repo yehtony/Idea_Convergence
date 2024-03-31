@@ -6,8 +6,9 @@ import io from 'socket.io-client';
 import ForumPage_Navbar from '../components/ForumPage_Navbar';
 import url from '../url.json';
 
+// TODO: Why we need to implement the socket in Dashboard. 
 export default function Dashboard() {
-    const ws = io.connect(url.backendHost);
+    const ws = io.connect(url.socketioHost);
     const [nodes, setNodes] = useState([]);
     const [numberOfTags, setNumberOfTags] = useState([]);
 
@@ -26,7 +27,7 @@ export default function Dashboard() {
             },
           });
 
-          console.log("fetchData: ", fetchData.data[0].Nodes);
+          // console.log("fetchData: ", fetchData.data[0].Nodes);
           setNodes(fetchData.data[0].Nodes);
         } catch (error) {
           console.error('Error fetching nodes:', error.message);
@@ -62,12 +63,12 @@ export default function Dashboard() {
   
     const initWebSocket = () => {
       ws.on('connect', () => {
-        console.log("WebSocket connected");
+        // console.log("WebSocket connected");
         getNodes();
       });
 
       ws.on('event02', (arg, callback) => {
-        console.log("WebSocket event02", arg);
+        // console.log("WebSocket event02", arg);
         getNodes();
         callback({
           status: 'event02 ok',
@@ -96,7 +97,9 @@ export default function Dashboard() {
 
     return (
       <div className="home-container">
-        <ForumPage_Navbar/>
+        <ForumPage_Navbar
+          ws={ws}
+        />
         <div id="chart"></div>
       </div>
     );

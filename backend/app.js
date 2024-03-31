@@ -25,12 +25,12 @@ const corseOptions = {
 db.sequelize
   .sync()
   .then(() => {
-    console.log('Initialing...');
+    // console.log('Initialing...');
     //initial();  // 産生資料表後，呼叫 initial function 為 roles table 新增三筆初始資料
-    console.log('Initialing... done');
+    // console.log('Initialing... done');
   })
   .catch((err) => {
-    console.log('Failed to sync db: ' + err.message);
+    // console.log('Failed to sync db: ' + err.message);
   });
 
 app.use(cors(corseOptions));

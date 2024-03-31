@@ -23,13 +23,13 @@ exports.create = async (req, res) => {
             NodeId: node.id
         })
 
-        console.log('Created node:', node);
+        // console.log('Created node:', node);
         res.status(200).send({
             message: 'Node created successfully',
             node: node
         });
     } catch (err) {
-        console.log('Error while creating node:', err);
+        // console.log('Error while creating node:', err);
         res.status(500).send({
             message: 'Error while creating node',
             error: err.message

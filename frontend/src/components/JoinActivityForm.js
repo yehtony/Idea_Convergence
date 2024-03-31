@@ -41,17 +41,17 @@ export const JoinActivityForm = () => {
                 setData({
                     joinCode: ""
                 })
-                console.log(response.status, response.data);
+                // console.log(response.status, response.data);
                 window.location.reload(false);
             })
             .catch((error) => {
                 if (error.response) {
-                    console.log(error.response);
-                    console.log("server responded");
+                    // console.log(error.response);
+                    // console.log("server responded");
                 } else if (error.request) {
-                    console.log("network error");
+                    // console.log("network error");
                 } else {
-                    console.log(error);
+                    // console.log(error);
                 }
             });
     };

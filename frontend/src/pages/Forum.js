@@ -6,51 +6,23 @@ import ForumPage_Navbar from '../components/ForumPage_Navbar';
 import Graph from "react-vis-network-graph";
 import { ViewNode } from '../components/ViewNode';
 import url from '../url.json';
-
-function getEmoji(tag){
-  switch (tag) {
-    case 'idea': {
-      return "💡";
-    }
-    case 'information': {
-      return "🔍";
-    }
-    case 'question': {
-      return "❓"
-    }
-    case 'experiment': {
-      return "🧪"
-    }
-    case 'record': {
-      return "📄"
-    }
-    case 'reply': {
-      return "💡"
-    }
-  }
-}
+import {genEdge, genNode} from "../utils/ideaTool";
 
 
 export default function Forum() {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [graph, setGraph] = useState({
+    nodes: [],
+    edges: [],
+  });
+
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
-  const ws = io.connect(url.backendHost);
+  const [ws, setSocket] = useState(null);
+  const activityId = localStorage.getItem('activityId')
 
-  const formatTimestamp = (timestamp) => {
-      return new Intl.DateTimeFormat('en-US', {
-          // year: 'numeric',
-          month: 'numeric',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric',
-          //   second: 'numeric',
-          hour12: false,
-      }).format(new Date(timestamp));
-  };
 
   const handleClickOpen = (nodeId) => {
+    setNodeContent(null);
     setOpen(true);
     fetchNodeData(nodeId);
   };
@@ -63,9 +35,9 @@ export default function Forum() {
     try {
       const response = await axios.get(`${url.backendHost + config[11].getOneNode}/${nodeId}`);
       setNodeContent(response.data);
-      console.log('Node Content: ', response.data);
+      // console.log('Node Content: ', response.data);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -80,7 +52,7 @@ export default function Forum() {
           authorization: 'Bearer JWT Token',
         },
       });
-      console.log("1. groupData:response ", response.data.data[0].id);
+      // console.log("1. groupData:response ", response.data.data[0].id);
       localStorage.setItem('groupId', response.data.data[0].id);
     } catch (error) {
       try {
@@ -89,97 +61,95 @@ export default function Forum() {
             authorization: 'Bearer JWT Token',
           },
         });
-        console.log("1. groupData:response ", response.data.data[0].id);
+        // console.log("1. groupData:response ", response.data.data[0].id);
         localStorage.setItem('groupId', response.data.data[0].id);
       } catch (error) {
         console.error("Error fetching group data", error);
       }
     } finally {
-      getNodes();
+      await getNodes();
     }
   };
+  useEffect(() => {
+    async function fetchData() {
+      await fetchGroupData();
+      setSocket(io.connect(url.socketioHost));
+    }
+    fetchData();
+    
+
+  },[]);
+
 
   useEffect(() => {
-    if (ws) {
-      initWebSocket();
+    if(ws){
+      console.log("initWebSocket");
+      ws.on('connect', () => {
+        console.log("WebSocket connected");
+      });
+  
+      ws.on(`node-recieve-${activityId}`, (body) => {
+        if(body.groupId==localStorage.getItem('groupId')){
+          setGraph(graph => ({
+            nodes: [...graph.nodes,genNode(body)],
+            edges: graph.edges,
+          }));
+        }
+      });
+      ws.on(`edge-recieve-${activityId}`, (body) => {
+        if(body.groupId==localStorage.getItem('groupId')){
+          setGraph(graph =>({
+            nodes: graph.nodes,
+            edges: [...graph.edges,genEdge(body)]
+          }));
+          
+        }
+      });
     }
-
-    const asyncFn = async () => {
-      await fetchGroupData();
-    };
-
-    asyncFn();
     
-  }, []);
+
+    
+  }, [ws]);
 
   const getNodes = async () => {
-    try{
-      if(localStorage.getItem('groupId')==null){
-        const asyncFn = async () => {
-          await fetchGroupData();
-        };
-    
-        asyncFn();
-      }
-
-      const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${localStorage.getItem('groupId')}`, {
-        
-        headers: {
-          authorization: 'Bearer JWT Token',
-        },
-      });
-
-      const fetchEdge = await axios.get(`${url.backendHost + config[10].getEdge}/${localStorage.getItem('groupId')}`, {
-        headers: {
-          authorization: 'Bearer JWT Token',
-        },
-      });
-
-      console.log("fetchData: ", fetchData);
-      console.log("fetchEdge: ", fetchEdge);
-
-      const nodeData = fetchData.data[0].Nodes.map((node) => ({
-        id: node.id,
-        label: getEmoji(node.tags) + "\n" + "\n" + node.title + "\n"  + "\n" + node.author + "\n" + `${formatTimestamp(node.createdAt)}`,
-        title: node.content,
-        group: node.tags,
-      }));
-
-      const edgeData = fetchEdge.data.map((edge) => ({
-        from: edge.from,
-        to: edge.to
-      }));
-
-      console.log('nodeData: ', nodeData);
-      console.log('edgeData: ', edgeData);
-      setNodes(nodeData);
-      setEdges(edgeData);
-      console.log('graph: ', nodes);
-      localStorage.setItem("nodeDataLength", nodeData.length + 1);
-    } catch (error) {
-      console.error('Error fetching nodes:', error.message);
+    if(localStorage.getItem('groupId')==null){
+      const asyncFn = async () => {
+        await fetchGroupData();
+      };
+  
+      asyncFn();
     }
-  };
 
-  const initWebSocket = () => {
-    ws.on('connect', () => {
-      console.log("WebSocket connected");
-      getNodes();
+    const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${localStorage.getItem('groupId')}`, {
+      
+      headers: {
+        authorization: 'Bearer JWT Token',
+      },
     });
 
-    ws.on('event02', (arg, callback) => {
-      console.log("WebSocket event02", arg);
-      getNodes();
-      callback({
-        status: 'event02 ok',
-      });
+    const fetchEdge = await axios.get(`${url.backendHost + config[10].getEdge}/${localStorage.getItem('groupId')}`, {
+      headers: {
+        authorization: 'Bearer JWT Token',
+      },
     });
+
+    console.log("fetchData: ", fetchData);
+    // console.log("fetchEdge: ", fetchEdge);
+
+    const nodeData = fetchData.data[0].Nodes.map((node) => genNode(node));
+
+    const edgeData = fetchEdge.data.map((edge) => genEdge(edge));
+
+    console.log('nodeData: ', nodeData);
+    console.log('edgeData: ', edgeData);
+    localStorage.setItem("nodeDataLength", nodeData.length + 1);
+    setGraph({
+      nodes: nodeData,
+      edges: edgeData,
+    });
+
   };
 
-  const graph = {
-    nodes: nodes,
-    edges: edges,
-  };
 
   const options = {
     layout: {
@@ -195,8 +165,25 @@ export default function Forum() {
       },
     },
     interaction: {
-      navigationButtons: true,
-      tooltipDelay: 300
+        navigationButtons: true,
+        dragNodes:true,
+        dragView: true,
+        hideEdgesOnDrag: false,
+        hideEdgesOnZoom: false,
+        hideNodesOnDrag: false,
+        hover: false,
+        hoverConnectedEdges: true,
+        keyboard: {
+          enabled: false,
+          speed: {x: 10, y: 10, zoom: 0.02},
+          bindToWindow: true
+        },
+        multiselect: false,
+        selectable: true,
+        selectConnectedEdges: true,
+        tooltipDelay: 300,
+        zoomSpeed: 1,
+        zoomView: true
     },
     clickToUse: false,
     groups: {
@@ -385,21 +372,20 @@ export default function Forum() {
 
   const events = {
     click: (event) => {
-      var { nodes, edges, items } = event;
-      console.log('click~', nodes);
-      console.log('click~', event);
-      if (nodes.length === 1) {
-        handleClickOpen(nodes[0]);
-        localStorage.setItem('nodeId', nodes[0]);
+      // console.log(`events:`,event);
+      // console.log(`events:targetNodes`,event.nodes);
+      if (event.nodes.length === 1) {
+        handleClickOpen(event.nodes[0]);
+        localStorage.setItem('nodeId', event.nodes[0]);
       }
     }
   };
-  // if(document.getElementById("graph")){
-  //   document.getElementById("graph").click();
-  // }
+
   return (
     <div className="home-container">
-      <ForumPage_Navbar/>
+      <ForumPage_Navbar
+          ws={ws}
+      />
       <div
         id="graph"
         style={{
@@ -411,11 +397,10 @@ export default function Forum() {
           left: '0',
           marginLeft: '64px',
         }}
-        onClick={()=> console.log('Hi')}
       >
         <Graph graph={graph} options={options} events={events}/>
       </div> 
-      <ViewNode open={open} onClose={handleClose} nodeContent={nodeContent} />
+      <ViewNode open={open} onClose={handleClose} nodeContent={nodeContent} ws={ws}/>
     </div>
   );
 }

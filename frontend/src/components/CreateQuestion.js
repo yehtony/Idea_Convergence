@@ -1,28 +1,23 @@
-import config from '../config.json';
-import axios from "axios";
 import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormHelperText, TextField } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { sendMessage } from '../utils/socketTool';
-import io from 'socket.io-client';
-import url from '../url.json';
+import { newNode } from '../utils/ideaTool';
 
-export const CreateQuestion = ({ open, onClose }) => {
+export const CreateQuestion = ({ open, onClose, ws }) => {
     const name = localStorage.getItem('name');
-    const ws = io.connect(url.backendHost);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
     const [loading, setLoading] = useState(false);
-    const [content, setContent] = useState();
-    const [data, setData] = useState({
+    const nodeDefault = {
       title: "",
-      content: content,
+      content: "",
       tags: "question",
       author: name,
       groupId: localStorage.getItem('groupId')
-    });
+    }
+    const [data, setData] = useState(nodeDefault);
     const onEditorStateChange = function (editorState) {
       setEditorState(editorState);
       let content = editorState.getCurrentContent().getPlainText("\u0001");
@@ -30,7 +25,7 @@ export const CreateQuestion = ({ open, onClose }) => {
         ...data,
         content: content,
       });
-      console.log("content: ", content);
+      // console.log("content: ", content);
     };
 
     const handleChange = (e) => {
@@ -41,55 +36,46 @@ export const CreateQuestion = ({ open, onClose }) => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
       const isTitleValid = data.title.trim().length > 0;
       const titleValidLength = data.title.trim().length < 15;
       if(
-        isTitleValid && 
-        titleValidLength &&
-        editorState.getCurrentContent().hasText() &&
-        editorState.getCurrentContent().getPlainText().length > 0
+        !isTitleValid || 
+        !titleValidLength || 
+        !editorState.getCurrentContent().hasText() || 
+        !editorState.getCurrentContent().getPlainText().length > 0
       ) {
-        const ideaData = {
-          title: data.title,
-          content: data.content,
-          tags: data.tags,
-          author: data.author,
-          groupId: data.groupId
-        };
-      
-        setLoading(true);
-        axios
-            .post(url.backendHost + config[7].createNode, ideaData)
-            .then((response) => {
-                onClose(onClose);
-                setLoading(false);
-                setData({
-                  title: "",
-                  content: "",
-                  tags: "",
-                  author: "",
-                  groupId: ""
-                })
-                console.log(response.status, response.data);
-                console.log("4",typeof ws);
-                sendMessage(ws);
-            })
-            .catch((error) => {
-                if (error.response) {
-                    console.log(error.response);
-                    console.log("server responded");
-                    setLoading(false);
-                } else if (error.request) {
-                    console.log("network error");
-                    setLoading(false);
-                } else {
-                    console.log(error);
-                    setLoading(false);
-                }
-            });
+        return alert("請確定以下項目： \n1. 標題及內容都已輸入\n2. 標題長度不超過15個字");
       }
+      const ideaData = {
+        title: data.title,
+        content: data.content,
+        tags: data.tags,
+        author: data.author,
+        groupId: data.groupId
+      };
+      setLoading(true);
+      try {
+        await newNode(ideaData, localStorage.getItem('activityId'),ws);
+        onClose(onClose);
+        setLoading(false);
+        setData(nodeDefault);
+        setEditorState(EditorState.createEmpty());
+      }
+      catch(error){
+          if (error.response) {
+              // console.log(error.response);
+              // console.log("server responded");
+              setLoading(false);
+          } else if (error.request) {
+              // console.log("network error");
+              setLoading(false);
+          } else {
+              // console.log(error);
+              setLoading(false);
+          }
+      }; 
     };
 
     return (

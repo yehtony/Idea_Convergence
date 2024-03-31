@@ -111,7 +111,7 @@ const menuItems = [
 // const specialItems = ['新增紀錄', '學習歷程', '討論區'];
 const specialItems = ['新增實驗', '新增紀錄', '學習歷程'];
 
-export default function ForumPage_Navbar() {
+export default function ForumPage_Navbar({ ws }) {
   const navigate = useNavigate();
   const [activityData, setActivityData] = useState(null);
   const theme = useTheme();
@@ -152,7 +152,7 @@ export default function ForumPage_Navbar() {
         const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${localStorage.getItem('activityId')}`);
         setActivityData(response.data);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
 
@@ -263,30 +263,35 @@ export default function ForumPage_Navbar() {
         <CreateIdea
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createQuestion' && (
         <CreateQuestion
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createInformation' && (
         <CreateInformation
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createFlask' && (
         <CreateFlask
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createNote' && (
         <CreateNote
           open={openModal}
           onClose={closeModal}
+          ws={ws}
         />
       )}
       {selectedModal === 'createLearningFeedback' && (

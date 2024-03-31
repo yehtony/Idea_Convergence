@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Divider } from '@mui/material';
 import { CreateReply } from './CreateReply';
 
-export const ViewNode = ({ open, onClose, nodeContent }) => {
+export const ViewNode = ({ open, onClose, nodeContent, ws}) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [id, setId] = useState('');
 
@@ -79,6 +79,7 @@ export const ViewNode = ({ open, onClose, nodeContent }) => {
                 open={modalOpen}
                 onClose={closeModal}
                 nodeContent={nodeContent}
+                ws={ws}
             />
         </>
     );
