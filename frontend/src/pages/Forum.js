@@ -156,7 +156,7 @@ export default function Forum() {
       randomSeed: 23,
       improvedLayout: true,
       hierarchical: {
-        enabled: true,
+        enabled: false,
         blockShifting: true,
         edgeMinimization: true,
         nodeSpacing: 150,
@@ -340,7 +340,7 @@ export default function Forum() {
       heightConstraint: { minimum: 100, valign: 'middle' },
       widthConstraint: { minimum: 100, maximum: 100 },
       mass: 1,
-      physics: false,
+      physics: false,     
       scaling: {
         label: {
           enabled: true,
@@ -361,22 +361,36 @@ export default function Forum() {
       },
       value: 1,
     },
-    // physics: {
-    //   enabled: true,
-    //   repulsion: {
-    //     nodeDistance: 150,
-    //     springLength: 100
-    //   }
-    // }      
+     
   };
 
   const events = {
     click: (event) => {
-      // console.log(`events:`,event);
+      console.log(`Graph:click:events:`,event);
+      console.log(`Graph:click:graph`,graph);
       // console.log(`events:targetNodes`,event.nodes);
       if (event.nodes.length === 1) {
         handleClickOpen(event.nodes[0]);
         localStorage.setItem('nodeId', event.nodes[0]);
+      }
+
+    },
+    dragEnd:  (event) => {
+      //console.log(`Graph:dragEnd:events:`,event);
+      const dragNodeId = event.nodes[0];
+      //console.log(`Graph:dragEnd:dragNode`,dragNodeId);
+      if(dragNodeId){
+        //console.log(`Graph:dragEnd:graph-1`,graph);
+        const nodePositions = event.pointer.DOM;
+        //console.log(`Graph:dragEnd:nodePositions`,nodePositions);
+        graph.nodes.forEach(element => {
+          if(element.id == dragNodeId){
+            element.x = nodePositions.x;
+            element.y = nodePositions.y;
+          }
+          
+        });
+        //console.log(`Graph:dragEnd:graph-2`,graph);
       }
     }
   };
