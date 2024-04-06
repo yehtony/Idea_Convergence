@@ -156,7 +156,7 @@ export default function Forum() {
       randomSeed: 23,
       improvedLayout: true,
       hierarchical: {
-        enabled: false,
+        enabled: true,
         blockShifting: true,
         edgeMinimization: true,
         nodeSpacing: 150,
