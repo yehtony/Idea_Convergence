@@ -1,5 +1,7 @@
 const db = require('../models');
 const { customAlphabet } = require('nanoid');
+const activityGroupModel = require('../models/activityGroup.model');
+const activityModel = require('../models/activity.model');
 
 // Assigning activities to the variable Activity
 const User = db.User;
@@ -72,7 +74,7 @@ exports.createGroupsForActivity = async (req, res) => {
         const createdGroups = [];
 
         for (let i = 0; i < numGroups; i++) {
-            const joinCode = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 5)();
+            const joinCode = activityId + customAlphabet('1234567890', 5)();
             const group = await Group.create({
                 groupName: groupName,
                 joinCode: joinCode,
