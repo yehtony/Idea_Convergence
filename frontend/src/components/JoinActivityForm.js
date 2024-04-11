@@ -41,10 +41,12 @@ export const JoinActivityForm = () => {
                 setData({
                     joinCode: ""
                 })
+                alert("成功加入活動!");
                 // console.log(response.status, response.data);
                 window.location.reload(false);
             })
             .catch((error) => {
+                alert("加入活動失敗 請確認邀請碼!");
                 if (error.response) {
                     // console.log(error.response);
                     // console.log("server responded");

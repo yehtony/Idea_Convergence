@@ -100,7 +100,7 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
           to: localStorage.getItem('nodeId'),
         };
         const responseFromPostEdge = await newEdge(edgeData, localStorage.getItem('activityId'),ws);
-
+        alert("回覆成功");
         
         //
         onClose(onClose);
@@ -109,6 +109,7 @@ export const CreateReply = ({ open, onClose, nodeContent, ws }) => {
         setEditorState(EditorState.createEmpty());
       }
       catch(error){
+          alert("回覆失敗");
           if (error.response) {
               // console.log(error.response);
               // console.log("server responded");

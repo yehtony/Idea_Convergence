@@ -82,6 +82,7 @@ export const Login = () => {
                 // console.log("res: ", response.data)
             })
             .catch((error) => {
+                alert("登入失敗 請確認帳號密碼");
                 if (error.response) {
                     // console.log(error.response);
                     // console.log("server responded");
