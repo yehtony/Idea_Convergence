@@ -167,10 +167,11 @@ export default function MyCreatedActivityCard({ activity }) {
                   `${url.backendHost + config[5].joinActivity}/${createGroupResponse.data.groups[0].joinCode}/join`,
                   activityData
               );
-
+              alert("新增成功");
               // console.log(joinGroupResponse.status, joinGroupResponse.data);
               window.location.reload(false);
           } catch (error) {
+              alert("新增失敗");
               if (error.response) {
                   // console.log(error.response);
                   // console.log("server responded");

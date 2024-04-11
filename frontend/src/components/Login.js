@@ -78,7 +78,7 @@ export const Login = () => {
                 localStorage.setItem('userId', response.data.id);
                 localStorage.setItem('name', response.data.name);
                 localStorage.setItem('email', response.data.email);
-
+                alert("登入成功!");
                 // console.log("res: ", response.data)
             })
             .catch((error) => {
