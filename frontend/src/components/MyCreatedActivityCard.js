@@ -82,7 +82,8 @@ export default function MyCreatedActivityCard({ activity }) {
 
     const openInNewTab = (url) => {
       window.open(url, "_blank", "noreferrer");
-      setSelectedModal(null)
+      localStorage.setItem('activityId', activity.id);
+      setSelectedModal(null);
     }
 
     const initWebSocket = () => {

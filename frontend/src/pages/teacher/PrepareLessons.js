@@ -69,10 +69,14 @@ export default function PrepareLessons() {
     setSelectAll(false); // Reset selectAll
     getGroups();
   };
+  
+  useEffect(() => {
+      setSocket(io.connect(url.socketioHost));
+      getGroups();
+  },[]);
 
   useEffect(() => {
     console.log("活動序號: ", localStorage.getItem("activityId"));
-    getGroups();
     if(ws){
       console.log("initWebSocket");
       ws.on('connect', () => {
