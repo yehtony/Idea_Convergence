@@ -137,15 +137,13 @@ export default function PrepareLessons() {
       };
       setLoading(true);
       try {
+        alert("任務傳送中...");
         await Promise.all(
           selectedGroups.map(async (groupId) => {
             ideaData.groupId = groupId;
-            const response = await axios.post(url.backendHost + config[7].createNode, ideaData);
-            // console.log(response.status, response.data);
+            await newNode(ideaData, localStorage.getItem('activityId'), ws);
           })
         );
-        alert("任務傳送中...");
-        await newNode(ideaData, localStorage.getItem('activityId'), ws);
         alert("派發任務成功！");
         setLoading(false);
         resetForm(); // Reset the form after successful submission
