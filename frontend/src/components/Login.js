@@ -78,10 +78,11 @@ export const Login = () => {
                 localStorage.setItem('userId', response.data.id);
                 localStorage.setItem('name', response.data.name);
                 localStorage.setItem('email', response.data.email);
-
+                alert("登入成功!");
                 // console.log("res: ", response.data)
             })
             .catch((error) => {
+                alert("登入失敗 請確認帳號密碼");
                 if (error.response) {
                     // console.log(error.response);
                     // console.log("server responded");

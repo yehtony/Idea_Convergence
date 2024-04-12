@@ -58,12 +58,14 @@ export const CreateQuestion = ({ open, onClose, ws }) => {
       setLoading(true);
       try {
         await newNode(ideaData, localStorage.getItem('activityId'),ws);
+        alert("新增成功");
         onClose(onClose);
         setLoading(false);
         setData(nodeDefault);
         setEditorState(EditorState.createEmpty());
       }
       catch(error){
+          alert("新增失敗");
           if (error.response) {
               // console.log(error.response);
               // console.log("server responded");

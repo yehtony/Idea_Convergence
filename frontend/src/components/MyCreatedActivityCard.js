@@ -56,7 +56,7 @@ export default function MyCreatedActivityCard({ activity }) {
     const open = Boolean(anchorEl);
 
     const options = [
-      { text: '進入備課區', modalKey: 'enterPageOfPrepareLesson', icon: AssignmentIcon },
+      { text: '進入課程包', modalKey: 'enterPageOfPrepareLesson', icon: AssignmentIcon },
       { text: '學生分組', modalKey: 'activityGrouping', icon: ActivityGroupingIcon },
       { text: '編輯活動資訊', modalKey: 'editInformationOfActivity', icon: EditIcon },
       { text: '刪除', modalKey: 'deleteActivity', icon: TrashIcon },
@@ -167,10 +167,11 @@ export default function MyCreatedActivityCard({ activity }) {
                   `${url.backendHost + config[5].joinActivity}/${createGroupResponse.data.groups[0].joinCode}/join`,
                   activityData
               );
-
+              alert("新增成功");
               // console.log(joinGroupResponse.status, joinGroupResponse.data);
               window.location.reload(false);
           } catch (error) {
+              alert("新增失敗");
               if (error.response) {
                   // console.log(error.response);
                   // console.log("server responded");

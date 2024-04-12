@@ -55,9 +55,11 @@ export const CreateActivityForm = () => {
                     endDate: ""
                 })
                 // console.log(response.status, response.data);
+                alert("建立成功");
                 window.location.reload(false);
             })
             .catch((error) => {
+                alert("建立失敗");
                 if (error.response) {
                     // console.log(error.response);
                     // console.log("server responded");
