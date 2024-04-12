@@ -21,12 +21,12 @@ import SendIcon from '@mui/icons-material/Send';
 import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { sendMessage } from '../../utils/socketTool';
+import { newNode } from '../../utils/ideaTool';
 import url from '../../url.json';
 
 export default function PrepareLessons() {
   const name = localStorage.getItem('name');
-  const ws = io.connect(url.socketioHost);
+  const [ws, setSocket] = useState(null);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -49,24 +49,11 @@ export default function PrepareLessons() {
           authorization: 'Bearer JWT Token',
         },
       });
-      // console.log('GroupData: ', fetchData.data.Groups);
+      console.log('GroupData: ', fetchData.data.Groups);
       setGroupData(fetchData.data.Groups);
     } catch (err) {
       // console.log(err);
     }
-  };
-
-  const initWebSocket = () => {
-    ws.on('connect', () => {
-      // console.log('WebSocket connected');
-    });
-
-    ws.on('event02', (arg, callback) => {
-      // console.log('WebSocket event02', arg);
-      callback({
-        status: 'event02 ok',
-      });
-    });
   };
 
   const resetForm = () => {
@@ -80,16 +67,19 @@ export default function PrepareLessons() {
     });
     setSelectedGroups([]); // Clear selected groups
     setSelectAll(false); // Reset selectAll
-    initWebSocket();
     getGroups();
   };
 
   useEffect(() => {
-    if (ws) {
-      initWebSocket();
-      getGroups();
+    console.log("活動序號: ", localStorage.getItem("activityId"));
+    getGroups();
+    if(ws){
+      console.log("initWebSocket");
+      ws.on('connect', () => {
+        console.log("WebSocket connected");
+      });
     }
-  }, []);
+  }, [ws]);
 
   const onEditorStateChange = function (editorState) {
     setEditorState(editorState);
@@ -135,15 +125,13 @@ export default function PrepareLessons() {
       editorState.getCurrentContent().getPlainText().length > 0 &&
       selectedGroups.length > 0
     ) {
-      setLoading(true);
-
       const ideaData = {
         title: data.title,
         content: data.content,
         tags: data.tags,
         author: data.author,
       };
-
+      setLoading(true);
       try {
         await Promise.all(
           selectedGroups.map(async (groupId) => {
@@ -152,11 +140,11 @@ export default function PrepareLessons() {
             // console.log(response.status, response.data);
           })
         );
-
+        alert("任務傳送中...");
+        await newNode(ideaData, localStorage.getItem('activityId'), ws);
+        alert("派發任務成功！");
         setLoading(false);
         resetForm(); // Reset the form after successful submission
-        // console.log('4', typeof ws);
-        sendMessage(ws);
       } catch (error) {
         console.error('Error:', error);
         setLoading(false);
