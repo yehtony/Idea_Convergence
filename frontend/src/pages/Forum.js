@@ -106,9 +106,6 @@ export default function Forum() {
         }
       });
     }
-    
-
-    
   }, [ws]);
 
   const getNodes = async () => {

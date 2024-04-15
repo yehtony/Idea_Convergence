@@ -8,7 +8,7 @@ export const newNode = async (ideaData, activityId, ws) => {
   return axios
       .post(url.backendHost + config[7].createNode, ideaData)
       .then((response) => {
-          // console.log(response.status, response.data);
+          console.log("newNode");
           // console.log("5",typeof ws);
           sendNewNodeMessage(ws, {
             ...ideaData,
@@ -17,7 +17,8 @@ export const newNode = async (ideaData, activityId, ws) => {
             updatedAt:response.data.node.updatedAt,
             activityId: activityId
           });
-          return response
+          console.log("sendNewNodeMessage");
+          return response;
       });
 };
 
