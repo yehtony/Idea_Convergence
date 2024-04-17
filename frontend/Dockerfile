@@ -14,8 +14,10 @@ COPY . .
 # Building app
 RUN npm run build
 
+RUN npm install -g serve
+
 # Application server port
 EXPOSE 3000
 
 # Running the app
-CMD ["npm", "start"]
+CMD ["serve", "-s", "./build", "-l", "3000"]
