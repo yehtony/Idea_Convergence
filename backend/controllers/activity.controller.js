@@ -170,8 +170,12 @@ exports.getJoinedActivitiesByUserId = (req, res) => {
             include: [
                 {
                     model: ActivityGroup,
+                    
                     include: [{
                         model: Activity,
+                    },
+                    {
+                        model: Group,
                     }]
                 }
             ]

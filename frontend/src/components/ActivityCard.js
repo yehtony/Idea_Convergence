@@ -47,7 +47,8 @@ export default function ActivityCard({ activity }) {
     <div>
         <Item>
             <CardHeader
-                title={activity.ActivityGroup.Activity.title}
+                title={activity.ActivityGroup.Activity.title}      
+                subheader={activity.ActivityGroup.Group.groupName}   
             />
             <CardContent>
                 <Typography variant="body2" color="text.secondary">

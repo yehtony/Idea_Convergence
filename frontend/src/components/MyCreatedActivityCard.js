@@ -7,6 +7,7 @@ import { styled, Card, CardHeader, CardContent, Typography, CardActions, IconBut
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AssignmentIcon from '../assets/assignment.svg'
+import addgroup from '../assets/addgroup.svg';
 import EditIcon from '../assets/edit.svg';
 import TrashIcon from '../assets/trash.svg';
 import ActivityGroupingIcon from '../assets/group.svg'
@@ -54,9 +55,61 @@ export default function MyCreatedActivityCard({ activity }) {
     const [selectedModalOpen, setSelectedModalOpen] = useState(false);
     
     const open = Boolean(anchorEl);
+    const createGroup = (e) => {
+      axios
+      .get(url.backendHost + config[15].findAllGroup + localStorage.getItem('activityId'), {
+          headers: {
+              authorization: 'Bearer JWT Token',
+          },
+      })
+      .then(async (response) => {
+          const existingGroups = response.data.Groups;
+          const nextGroupNumber = existingGroups.length + 1;
+          const groupName = `第${nextGroupNumber}組`;
 
+          const groupData = {
+              groupName: groupName,
+              activityId: localStorage.getItem('activityId'),
+              numGroups: 1,
+          };
+
+          try {
+              const createGroupResponse = await axios.post(url.backendHost + config[14].creatGroup, groupData);
+              // console.log(createGroupResponse.status, createGroupResponse.data);
+              sendMessage(ws);
+
+              const activityData = {
+                  userId: localStorage.getItem('userId'),
+              };
+
+              const joinGroupResponse = await axios.put(
+                  `${url.backendHost + config[5].joinActivity}/${createGroupResponse.data.groups[0].joinCode}/join`,
+                  activityData
+              );
+              alert("新增成功");
+              // console.log(joinGroupResponse.status, joinGroupResponse.data);
+              window.location.reload(false);
+          } catch (error) {
+              alert("新增失敗");
+              if (error.response) {
+                  // console.log(error.response);
+                  // console.log("server responded");
+              } else if (error.request) {
+                  // console.log("network error");
+              } else {
+                  // console.log(error);
+              }
+          }
+      })
+      .catch((error) => {
+          // console.log(error);
+      });
+    }
+    
+    
     const options = [
       { text: '進入課程包', modalKey: 'enterPageOfPrepareLesson', icon: AssignmentIcon },
+      { text: '新增小組', onClick: createGroup, icon: addgroup },
       { text: '學生分組', modalKey: 'activityGrouping', icon: ActivityGroupingIcon },
       { text: '編輯活動資訊', modalKey: 'editInformationOfActivity', icon: EditIcon },
       { text: '刪除', modalKey: 'deleteActivity', icon: TrashIcon },
@@ -136,56 +189,6 @@ export default function MyCreatedActivityCard({ activity }) {
         }).format(new Date(timestamp));
     };
 
-    const createGroup = (e) => {
-      axios
-      .get(url.backendHost + config[15].findAllGroup + localStorage.getItem('activityId'), {
-          headers: {
-              authorization: 'Bearer JWT Token',
-          },
-      })
-      .then(async (response) => {
-          const existingGroups = response.data.Groups;
-          const nextGroupNumber = existingGroups.length + 1;
-          const groupName = `第${nextGroupNumber}組`;
-
-          const groupData = {
-              groupName: groupName,
-              activityId: localStorage.getItem('activityId'),
-              numGroups: 1,
-          };
-
-          try {
-              const createGroupResponse = await axios.post(url.backendHost + config[14].creatGroup, groupData);
-              // console.log(createGroupResponse.status, createGroupResponse.data);
-              sendMessage(ws);
-
-              const activityData = {
-                  userId: localStorage.getItem('userId'),
-              };
-
-              const joinGroupResponse = await axios.put(
-                  `${url.backendHost + config[5].joinActivity}/${createGroupResponse.data.groups[0].joinCode}/join`,
-                  activityData
-              );
-              alert("新增成功");
-              // console.log(joinGroupResponse.status, joinGroupResponse.data);
-              window.location.reload(false);
-          } catch (error) {
-              alert("新增失敗");
-              if (error.response) {
-                  // console.log(error.response);
-                  // console.log("server responded");
-              } else if (error.request) {
-                  // console.log("network error");
-              } else {
-                  // console.log(error);
-              }
-          }
-      })
-      .catch((error) => {
-          // console.log(error);
-      });
-    }
 
     const handleEnter = async (e) => {
       e.preventDefault();
@@ -243,21 +246,21 @@ export default function MyCreatedActivityCard({ activity }) {
                               },
                           }}
                       >
-                          {options.map((option) => (
-                              <MenuItem key={option.modalKey} onClick={() => openModal(option.modalKey)}>
-                                  <ListItemIcon
-                                      sx={{
-                                          minWidth: 0,
-                                          maxWidth: 24,
-                                          mr: open ? 3 : 'auto',
-                                          justifyContent: 'center',
-                                      }}
-                                  >
-                                      <img alt='' src={option.icon} />
-                                  </ListItemIcon>
-                                  <ListItemText primary={option.text} sx={{ opacity: open ? 1 : 0 }} style={{ color: '#8B8B8B' }} />
-                              </MenuItem>
-                          ))}
+                         {options.map((option) => (
+                          <MenuItem key={option.modalKey} onClick={() => option.onClick && option.onClick()}>
+                              <ListItemIcon
+                                  sx={{
+                                      minWidth: 0,
+                                      maxWidth: 24,
+                                      mr: open ? 3 : 'auto',
+                                      justifyContent: 'center',
+                                  }}
+                              >
+                                  <img alt='' src={option.icon} />
+                              </ListItemIcon>
+                              <ListItemText primary={option.text} sx={{ opacity: open ? 1 : 0 }} style={{ color: '#8B8B8B' }} />
+                          </MenuItem>
+                      ))}
                       </Menu>
                   </>
                 }
@@ -269,14 +272,17 @@ export default function MyCreatedActivityCard({ activity }) {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <Button className='enter-activity-button' onClick={createGroup}>
-                    新增小組
+                <Button className='enter-activity-button' onClick={handleExpandClick}>
+                    展開小組列表
                 </Button>
                 <ExpandMore
                   expand={expanded}
                   onClick={handleExpandClick}
                   aria-expanded={expanded}
                   aria-label="show more"
+                  sx={{
+                    fontSize: 42, 
+                  }}
                 >
                   <ExpandMoreIcon />
                 </ExpandMore>
