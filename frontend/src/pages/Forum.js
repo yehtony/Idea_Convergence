@@ -161,7 +161,7 @@ export default function Forum() {
         edgeMinimization: true,
         nodeSpacing: 150,
         direction: 'RL',
-        sortMethod: 'directed',
+        sortMethod: 'hubsize',
       },
     },
     interaction: {
