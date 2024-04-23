@@ -79,16 +79,15 @@ export const genEdge = (edgeData) => {
   }
 };
 
-let conterNode = 0;
+
 export const genNode = (ideaData) => {
   // console.log(`ideaTool:genNode:ideaData`, ideaData);
-  conterNode+=1;
+ 
   return {
     id: ideaData.id,
     label: getEmoji(ideaData.tags) + "\n" + "\n" + ideaData.title + "\n"  + "\n" + ideaData.author + "\n" + `${formatTimestamp(ideaData.createdAt)}`,
     title: ideaData.content,
     group: ideaData.tags,
-    x: conterNode*100,
-    y: conterNode%2==0? 0:200
+
   }
 };
