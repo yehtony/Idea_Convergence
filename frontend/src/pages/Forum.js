@@ -374,24 +374,7 @@ export default function Forum() {
         localStorage.setItem('nodeId', event.nodes[0]);
       }
 
-    },
-    dragEnd:  (event) => {
-      //console.log(`Graph:dragEnd:events:`,event);
-      const dragNodeId = event.nodes[0];
-      //console.log(`Graph:dragEnd:dragNode`,dragNodeId);
-      if(dragNodeId){
-        //console.log(`Graph:dragEnd:graph-1`,graph);
-        const nodePositions = event.pointer.DOM;
-        //console.log(`Graph:dragEnd:nodePositions`,nodePositions);
-        graph.nodes.forEach(element => {
-          if(element.id == dragNodeId){
-            element.x = nodePositions.x;
-            element.y = nodePositions.y;
-          }
-          
-        });
-        //console.log(`Graph:dragEnd:graph-2`,graph);
-      }
+    
     }
   };
 
