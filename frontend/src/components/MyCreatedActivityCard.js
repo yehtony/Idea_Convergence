@@ -100,7 +100,9 @@ export default function MyCreatedActivityCard({ activity }) {
                   // console.log(error);
               }
           }
+          
           window.location.reload(false);
+
       })
       .catch((error) => {
           // console.log(error);
