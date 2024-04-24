@@ -43,12 +43,14 @@ export default function ActivityCard({ activity }) {
         navigate("/forum");
     };
 
+
+    console.log(`groupName: ${activity.ActivityGroup.Group.groupName}`);
     return (
     <div>
         <Item>
             <CardHeader
                 title={activity.ActivityGroup.Activity.title}      
-                subheader={activity.ActivityGroup.Group.groupName}   
+                subheader={activity.ActivityGroup.Group.groupName ?? ''}   
             />
             <CardContent>
                 <Typography variant="body2" color="text.secondary">

@@ -247,7 +247,7 @@ export default function MyCreatedActivityCard({ activity }) {
                           }}
                       >
                          {options.map((option) => (
-                          <MenuItem key={option.modalKey} onClick={() => option.onClick && option.onClick()}>
+                          <MenuItem key={option.modalKey} onClick={() => { openModal(option.modalKey); option.onClick && option.onClick(); }}>
                               <ListItemIcon
                                   sx={{
                                       minWidth: 0,
@@ -316,8 +316,8 @@ export default function MyCreatedActivityCard({ activity }) {
             </Collapse>
         </Item>
         {selectedModal === 'enterPageOfPrepareLesson' && (
-            openInNewTab("./pageOfPrepareLesson")
-        )}
+            navigate('/teacher/pageOfPrepareLesson')
+          )}
         {/* {selectedModal === 'editInformationOfActivity' && (
             <CreateIdea
                 open={openModal}
