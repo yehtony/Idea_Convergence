@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import config from '../config.json';
-import axios from "axios";
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
-import { Box, Toolbar, Tooltip, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Divider, IconButton, Badge } from '@mui/material';
+import {
+  Box,
+  Toolbar,
+  Tooltip,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Divider,
+  IconButton,
+  Badge,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import BackToHomeIcon from '../assets/返回首頁icon.png';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -27,6 +40,7 @@ import { CreateInformation } from './CreateInformation';
 import { CreateFlask } from './CreateFlask';
 import { CreateNote } from './CreateNote';
 import url from '../url.json';
+import { GroupChatRoom } from './GroupChatRoom';
 
 const drawerWidth = 240;
 
@@ -78,22 +92,22 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
-);
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
+}));
 
 const menuItems = [
   { text: '新增想法', modalKey: 'createIdea', icon: IdeaIcon },
@@ -103,7 +117,11 @@ const menuItems = [
   { text: '新增紀錄', modalKey: 'createNote', icon: NoteIcon },
   // { text: '新增想法牆', modalKey: 'createForum', icon: CreateForumIcon },
   // { text: '任務地圖', modalKey: 'createTaskMap', icon: TaskMapIcon },
-  { text: '學習歷程', modalKey: 'createLearningFeedback', icon: LearningFeedbackIcon },
+  {
+    text: '學習歷程',
+    modalKey: 'createLearningFeedback',
+    icon: LearningFeedbackIcon,
+  },
   // { text: '討論區', modalKey: 'backToForum', icon: ForumIcon },
 ];
 
@@ -120,8 +138,8 @@ export default function ForumPage_Navbar({ ws }) {
   const [selectedModalOpen, setSelectedModalOpen] = useState(false);
 
   const openInNewTab = (url) => {
-    window.open(url, "_blank", "noreferrer");
-    setSelectedModal(null)
+    window.open(url, '_blank', 'noreferrer');
+    setSelectedModal(null);
   };
 
   const handleDrawerOpen = () => {
@@ -143,13 +161,17 @@ export default function ForumPage_Navbar({ ws }) {
   };
 
   const selecteditemstyle = {
-    backgroundColor: 'red'
-  }
+    backgroundColor: 'red',
+  };
 
   useEffect(() => {
     const getActivityData = async () => {
       try {
-        const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${localStorage.getItem('activityId')}`);
+        const response = await axios.get(
+          `${url.backendHost + config[6].enterActivity}/${localStorage.getItem(
+            'activityId'
+          )}`
+        );
         setActivityData(response.data);
       } catch (err) {
         // console.log(err);
@@ -162,7 +184,11 @@ export default function ForumPage_Navbar({ ws }) {
   return (
     <nav>
       {/* <AppBar position="fixed" open={open} style={{ background: 'transparent', boxShadow: 'none'}}> */}
-      <AppBar position="fixed" open={open} style={{ background: 'transparent', boxShadow: 'none'}}>
+      <AppBar
+        position="fixed"
+        open={open}
+        style={{ background: 'transparent', boxShadow: 'none' }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -174,25 +200,41 @@ export default function ForumPage_Navbar({ ws }) {
               ...(open && { display: 'none' }),
             }}
           >
-            <MenuIcon color="primary" style={{ color: '#8B8B8B', background: 'white', boxShadow: 'none'}}/>
+            <MenuIcon
+              color="primary"
+              style={{
+                color: '#8B8B8B',
+                background: 'white',
+                boxShadow: 'none',
+              }}
+            />
           </IconButton>
-          <Tooltip title='返回首頁' arrow>
-              <IconButton
-                size="large"
-                aria-label="show 4 new mails"
-                color="inherit"
-                onClick={() => navigate(-1)}
-              >
-                <Badge color="error">
-                  <img alt='返回首頁' src={BackToHomeIcon} width={24} height={24} />
-                </Badge>
-              </IconButton>
+          <Tooltip title="返回首頁" arrow>
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+              onClick={() => navigate(-1)}
+            >
+              <Badge color="error">
+                <img
+                  alt="返回首頁"
+                  src={BackToHomeIcon}
+                  width={24}
+                  height={24}
+                />
+              </Badge>
+            </IconButton>
           </Tooltip>
-          <Typography variant="h6" noWrap component="div"  color="black" fontWeight="bolder">
-            {activityData && (    // ensure that activityData is not null or undefined before trying to access its properties.
-              <>
-                {activityData.title}
-              </>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            color="black"
+            fontWeight="bolder"
+          >
+            {activityData && ( // ensure that activityData is not null or undefined before trying to access its properties.
+              <>{activityData.title}</>
             )}
           </Typography>
           {/* <Box sx={{ flexGrow: 1 }} />
@@ -216,19 +258,31 @@ export default function ForumPage_Navbar({ ws }) {
               </IconButton>
             </Tooltip>
           </Box> */}
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <GroupChatRoom activityData={activityData} ws={ws}/>
+          </Box>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            {theme.direction === 'rtl' ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
           </IconButton>
         </DrawerHeader>
         <Divider />
         <List>
           {menuItems.map((menuItem, index) => (
             <div key={menuItem.text}>
-              <ListItem selecteditemstyle={selecteditemstyle} disablePadding sx={{ display: 'block' }}>
+              <ListItem
+                selecteditemstyle={selecteditemstyle}
+                disablePadding
+                sx={{ display: 'block' }}
+              >
                 <Tooltip title={menuItem.text} arrow placement="right">
                   <ListItemButton
                     sx={{
@@ -246,58 +300,40 @@ export default function ForumPage_Navbar({ ws }) {
                         justifyContent: 'center',
                       }}
                     >
-                      <img alt='' src={menuItem.icon} />
+                      <img alt="" src={menuItem.icon} />
                     </ListItemIcon>
-                    <ListItemText primary={menuItem.text} sx={{ opacity: open ? 1 : 0 }} style={{ color: '#8B8B8B' }} />
+                    <ListItemText
+                      primary={menuItem.text}
+                      sx={{ opacity: open ? 1 : 0 }}
+                      style={{ color: '#8B8B8B' }}
+                    />
                   </ListItemButton>
                 </Tooltip>
               </ListItem>
-              {specialItems.includes(menuItem.text) && index < menuItems.length - 1 && (
-                <Divider />
-              )}
+              {specialItems.includes(menuItem.text) &&
+                index < menuItems.length - 1 && <Divider />}
             </div>
           ))}
         </List>
       </Drawer>
       {selectedModal === 'createIdea' && (
-        <CreateIdea
-          open={openModal}
-          onClose={closeModal}
-          ws={ws}
-        />
+        <CreateIdea open={openModal} onClose={closeModal} ws={ws} />
       )}
       {selectedModal === 'createQuestion' && (
-        <CreateQuestion
-          open={openModal}
-          onClose={closeModal}
-          ws={ws}
-        />
+        <CreateQuestion open={openModal} onClose={closeModal} ws={ws} />
       )}
       {selectedModal === 'createInformation' && (
-        <CreateInformation
-          open={openModal}
-          onClose={closeModal}
-          ws={ws}
-        />
+        <CreateInformation open={openModal} onClose={closeModal} ws={ws} />
       )}
       {selectedModal === 'createFlask' && (
-        <CreateFlask
-          open={openModal}
-          onClose={closeModal}
-          ws={ws}
-        />
+        <CreateFlask open={openModal} onClose={closeModal} ws={ws} />
       )}
       {selectedModal === 'createNote' && (
-        <CreateNote
-          open={openModal}
-          onClose={closeModal}
-          ws={ws}
-        />
+        <CreateNote open={openModal} onClose={closeModal} ws={ws} />
       )}
-      {selectedModal === 'createLearningFeedback' && (
+      {selectedModal === 'createLearningFeedback' &&
         // navigate("/dashboard")
-        openInNewTab("./dashboard")
-      )}
+        openInNewTab('./dashboard')}
       {/* {selectedModal === 'backToForum' && (
         navigate("/forum")
       )} */}

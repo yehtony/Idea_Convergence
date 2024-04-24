@@ -79,6 +79,7 @@ require("./routes/part.routes")(app);
 require("./routes/subPart.routes")(app);
 require("./routes/node.routes")(app);
 require("./routes/edge.routes")(app);
+require("./routes/chatRoomMessage.routes")(app);
 
 // simple route
 app.get("/", (req, res) => {

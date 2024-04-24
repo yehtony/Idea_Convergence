@@ -49,5 +49,11 @@
     },
     {
         "EnterDifferentGroup": "api/groups/teacher/"
+    },
+    {   
+        "createMessage": "api/chatRoomMessage/create"
+    },
+    {
+        "getMessage": "api/chatRoomMessage/all"
     }
 ]

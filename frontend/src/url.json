@@ -1,4 +1,4 @@
 {
-    "backendHost": "https://miniature-space-orbit-wr96v7jxwj93gpgq-8000.app.github.dev/",
-    "socketioHost": "https://miniature-space-orbit-wr96v7jxwj93gpgq-3030.app.github.dev/"
+    "backendHost": "http://localhost:8000/",
+    "socketioHost": "http://localhost:3030/"
 }
