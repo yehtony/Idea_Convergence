@@ -172,6 +172,7 @@ export default function ForumPage_Navbar({ ws }) {
             'activityId'
           )}`
         );
+        console.log(response.data);
         setActivityData(response.data);
       } catch (err) {
         // console.log(err);
@@ -260,7 +261,7 @@ export default function ForumPage_Navbar({ ws }) {
           </Box> */}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <GroupChatRoom activityData={activityData} ws={ws}/>
+            <GroupChatRoom activityData={activityData} />
           </Box>
         </Toolbar>
       </AppBar>

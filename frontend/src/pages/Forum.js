@@ -3,11 +3,10 @@ import axios from 'axios';
 import config from '../config.json';
 import io from 'socket.io-client';
 import ForumPage_Navbar from '../components/ForumPage_Navbar';
-import Graph from "react-vis-network-graph";
+import Graph from 'react-vis-network-graph';
 import { ViewNode } from '../components/ViewNode';
 import url from '../url.json';
-import {genEdge, genNode} from "../utils/ideaTool";
-
+import { genEdge, genNode } from '../utils/ideaTool';
 
 export default function Forum() {
   const [graph, setGraph] = useState({
@@ -18,8 +17,7 @@ export default function Forum() {
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
   const [ws, setSocket] = useState(null);
-  const activityId = localStorage.getItem('activityId')
-
+  const activityId = localStorage.getItem('activityId');
 
   const handleClickOpen = (nodeId) => {
     setNodeContent(null);
@@ -33,7 +31,9 @@ export default function Forum() {
 
   const fetchNodeData = async (nodeId) => {
     try {
-      const response = await axios.get(`${url.backendHost + config[11].getOneNode}/${nodeId}`);
+      const response = await axios.get(
+        `${url.backendHost + config[11].getOneNode}/${nodeId}`
+      );
       setNodeContent(response.data);
       // console.log('Node Content: ', response.data);
     } catch (err) {
@@ -43,9 +43,13 @@ export default function Forum() {
 
   //取得 groupId, 並在其後 render getNodes()
   const fetchGroupData = async () => {
-    const enterDifferentGroupEndpoint = `${url.backendHost}${config[16].EnterDifferentGroup}${localStorage.getItem('joinCode')}/${localStorage.getItem('userId')}`;
-    const getMyGroupEndpoint = `${url.backendHost}${config[12].getMyGroup}/${localStorage.getItem('activityId')}/${localStorage.getItem('userId')}`;
-  
+    const enterDifferentGroupEndpoint = `${url.backendHost}${
+      config[16].EnterDifferentGroup
+    }${localStorage.getItem('joinCode')}/${localStorage.getItem('userId')}`;
+    const getMyGroupEndpoint = `${url.backendHost}${
+      config[12].getMyGroup
+    }/${localStorage.getItem('activityId')}/${localStorage.getItem('userId')}`;
+
     try {
       const response = await axios.get(enterDifferentGroupEndpoint, {
         headers: {
@@ -64,7 +68,7 @@ export default function Forum() {
         // console.log("1. groupData:response ", response.data.data[0].id);
         localStorage.setItem('groupId', response.data.data[0].id);
       } catch (error) {
-        console.error("Error fetching group data", error);
+        console.error('Error fetching group data', error);
       }
     } finally {
       await getNodes();
@@ -76,61 +80,66 @@ export default function Forum() {
       setSocket(io.connect(url.socketioHost));
     }
     fetchData();
-    
-
-  },[]);
-
+  }, []);
 
   useEffect(() => {
-    if(ws){
-      console.log("initWebSocket");
+    if (ws) {
+      console.log('initWebSocket');
       ws.on('connect', () => {
-        console.log("WebSocket connected");
+        console.log('WebSocket connected');
       });
-  
+
       ws.on(`node-recieve-${activityId}`, (body) => {
-        if(body.groupId==localStorage.getItem('groupId')){
-          setGraph(graph => ({
-            nodes: [...graph.nodes,genNode(body)],
+        if (body.groupId == localStorage.getItem('groupId')) {
+          setGraph((graph) => ({
+            nodes: [...graph.nodes, genNode(body)],
             edges: graph.edges,
           }));
         }
       });
       ws.on(`edge-recieve-${activityId}`, (body) => {
-        if(body.groupId==localStorage.getItem('groupId')){
-          setGraph(graph =>({
+        if (body.groupId == localStorage.getItem('groupId')) {
+          setGraph((graph) => ({
             nodes: graph.nodes,
-            edges: [...graph.edges,genEdge(body)]
+            edges: [...graph.edges, genEdge(body)],
           }));
-          
         }
       });
     }
   }, [ws]);
 
   const getNodes = async () => {
-    if(localStorage.getItem('groupId')==null){
+    if (localStorage.getItem('groupId') == null) {
       const asyncFn = async () => {
         await fetchGroupData();
       };
-  
+
       asyncFn();
     }
 
-    const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${localStorage.getItem('groupId')}`, {
-      
-      headers: {
-        authorization: 'Bearer JWT Token',
-      },
-    });
+    const fetchData = await axios.get(
+      `${url.backendHost + config[8].getNode}/${localStorage.getItem(
+        'groupId'
+      )}`,
+      {
+        headers: {
+          authorization: 'Bearer JWT Token',
+        },
+      }
+    );
 
-    const fetchEdge = await axios.get(`${url.backendHost + config[10].getEdge}/${localStorage.getItem('groupId')}`, {
-      headers: {
-        authorization: 'Bearer JWT Token',
-      },
-    });
+    const fetchEdge = await axios.get(
+      `${url.backendHost + config[10].getEdge}/${localStorage.getItem(
+        'groupId'
+      )}`,
+      {
+        headers: {
+          authorization: 'Bearer JWT Token',
+        },
+      }
+    );
 
-    console.log("fetchData: ", fetchData);
+    console.log('fetchData: ', fetchData);
     // console.log("fetchEdge: ", fetchEdge);
 
     const nodeData = fetchData.data[0].Nodes.map((node) => genNode(node));
@@ -139,14 +148,12 @@ export default function Forum() {
 
     console.log('nodeData: ', nodeData);
     console.log('edgeData: ', edgeData);
-    localStorage.setItem("nodeDataLength", nodeData.length + 1);
+    localStorage.setItem('nodeDataLength', nodeData.length + 1);
     setGraph({
       nodes: nodeData,
       edges: edgeData,
     });
-
   };
-
 
   const options = {
     layout: {
@@ -162,25 +169,25 @@ export default function Forum() {
       },
     },
     interaction: {
-        navigationButtons: true,
-        dragNodes:true,
-        dragView: true,
-        hideEdgesOnDrag: false,
-        hideEdgesOnZoom: false,
-        hideNodesOnDrag: false,
-        hover: false,
-        hoverConnectedEdges: true,
-        keyboard: {
-          enabled: false,
-          speed: {x: 10, y: 10, zoom: 0.02},
-          bindToWindow: true
-        },
-        multiselect: false,
-        selectable: true,
-        selectConnectedEdges: true,
-        tooltipDelay: 300,
-        zoomSpeed: 1,
-        zoomView: true
+      navigationButtons: true,
+      dragNodes: true,
+      dragView: true,
+      hideEdgesOnDrag: false,
+      hideEdgesOnZoom: false,
+      hideNodesOnDrag: false,
+      hover: false,
+      hoverConnectedEdges: true,
+      keyboard: {
+        enabled: false,
+        speed: { x: 10, y: 10, zoom: 0.02 },
+        bindToWindow: true,
+      },
+      multiselect: false,
+      selectable: true,
+      selectConnectedEdges: true,
+      tooltipDelay: 300,
+      zoomSpeed: 1,
+      zoomView: true,
     },
     clickToUse: false,
     groups: {
@@ -191,8 +198,8 @@ export default function Forum() {
           fontSize: 5,
           highlight: {
             border: '#FFC',
-            background: '#FFC'
-          }
+            background: '#FFC',
+          },
         },
       },
       question: {
@@ -201,8 +208,8 @@ export default function Forum() {
           background: '#CCF',
           highlight: {
             border: '#CCF',
-            background: '#CCF'
-          }
+            background: '#CCF',
+          },
         },
       },
       information: {
@@ -211,8 +218,8 @@ export default function Forum() {
           background: '#CFC',
           highlight: {
             border: '#CFC',
-            background: '#CFC'
-          }
+            background: '#CFC',
+          },
         },
       },
       experiment: {
@@ -221,9 +228,9 @@ export default function Forum() {
           background: '#FFDBDB',
           highlight: {
             border: '#FFDBDB',
-            background: '#FFDBDB'
-          }
-        }
+            background: '#FFDBDB',
+          },
+        },
       },
       record: {
         color: {
@@ -231,8 +238,8 @@ export default function Forum() {
           background: '#B9DCF4',
           highlight: {
             border: '#B9DCF4',
-            background: '#B9DCF4'
-          }
+            background: '#B9DCF4',
+          },
         },
       },
       reply: {
@@ -241,10 +248,10 @@ export default function Forum() {
           background: '#FFF',
           highlight: {
             border: '#FFF',
-            background: '#FFF'
-          }
+            background: '#FFF',
+          },
         },
-      }
+      },
       // add more groups here
     },
     edges: {
@@ -266,24 +273,24 @@ export default function Forum() {
       shape: 'box',
       borderWidth: 1,
       shapeProperties: {
-        borderRadius: 1
+        borderRadius: 1,
       },
       color: {
         border: '#E3DFFD',
         background: '#E3DFFD',
         highlight: {
           border: '#e3dffdcb',
-          background: '#e3dffdcb'
+          background: '#e3dffdcb',
         },
         hover: {
           border: '#e3dffdcb',
-          background: '#e3dffdcb'
-        }
+          background: '#e3dffdcb',
+        },
       },
       opacity: 1,
       fixed: {
         x: true,
-        y: true
+        y: true,
       },
       font: {
         color: '#343434',
@@ -300,7 +307,7 @@ export default function Forum() {
           size: 2, // px
           face: 'arial',
           vadjust: 0,
-          mod: 'bold'
+          mod: 'bold',
         },
         ital: {
           color: '#343434',
@@ -314,30 +321,30 @@ export default function Forum() {
           size: 5, // px
           face: 'arial',
           vadjust: 0,
-          mod: 'bold italic'
+          mod: 'bold italic',
         },
         mono: {
           color: '#343434',
           size: 5, // px
           face: 'courier new',
           vadjust: 2,
-          mod: ''
-        }
+          mod: '',
+        },
       },
       hidden: false,
-      label: "HTML",
+      label: 'HTML',
       level: undefined,
       margin: 10,
       shadow: {
         color: 'rgba(33,33,33,.7)',
         size: 10,
         x: 10,
-        y: 10
+        y: 10,
       },
       heightConstraint: { minimum: 100, valign: 'middle' },
       widthConstraint: { minimum: 100, maximum: 100 },
       mass: 1,
-      physics: false,     
+      physics: false,
       scaling: {
         label: {
           enabled: true,
@@ -346,40 +353,34 @@ export default function Forum() {
           drawThreshold: 12,
           // maxVisible: 30,
         },
-        customScalingFunction: function (min,max,total,value) {
+        customScalingFunction: function (min, max, total, value) {
           if (max === min) {
             return 0.5;
-          }
-          else {
+          } else {
             let scale = 1 / (max - min);
-            return Math.max(0,(value - min)*scale);
+            return Math.max(0, (value - min) * scale);
           }
-        }
+        },
       },
       value: 1,
     },
-     
   };
 
   const events = {
     click: (event) => {
-      console.log(`Graph:click:events:`,event);
-      console.log(`Graph:click:graph`,graph);
+      console.log(`Graph:click:events:`, event);
+      console.log(`Graph:click:graph`, graph);
       // console.log(`events:targetNodes`,event.nodes);
       if (event.nodes.length === 1) {
         handleClickOpen(event.nodes[0]);
         localStorage.setItem('nodeId', event.nodes[0]);
       }
-
-    
-    }
+    },
   };
 
   return (
     <div className="home-container">
-      <ForumPage_Navbar
-          ws={ws}
-      />
+      <ForumPage_Navbar ws={ws} />
       <div
         id="graph"
         style={{
@@ -392,9 +393,14 @@ export default function Forum() {
           marginLeft: '64px',
         }}
       >
-        <Graph graph={graph} options={options} events={events}/>
-      </div> 
-      <ViewNode open={open} onClose={handleClose} nodeContent={nodeContent} ws={ws}/>
+        <Graph graph={graph} options={options} events={events} />
+      </div>
+      <ViewNode
+        open={open}
+        onClose={handleClose}
+        nodeContent={nodeContent}
+        ws={ws}
+      />
     </div>
   );
 }
