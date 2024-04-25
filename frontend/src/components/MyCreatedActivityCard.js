@@ -46,7 +46,7 @@ const ExpandMore = styled((props) => {
 const ITEM_HEIGHT = 48;
 
 export default function MyCreatedActivityCard({ activity }) {
-    const ws = io.connect(url.socketioHost);
+const ws = io.connect(url.socketioHost);
     const navigate = useNavigate();
     const [expanded, setExpanded] = useState(false);
     const [groupData, setGroupData] = useState([]);
@@ -87,8 +87,9 @@ export default function MyCreatedActivityCard({ activity }) {
                   activityData
               );
               alert("新增成功");
-              // console.log(joinGroupResponse.status, joinGroupResponse.data);
-              window.location.reload(false);
+              setAnchorEl(null);
+              setExpanded(false);
+              // callback_setActivities((prev) => [...prev, response.data]);
           } catch (error) {
               alert("新增失敗");
               if (error.response) {
@@ -101,7 +102,7 @@ export default function MyCreatedActivityCard({ activity }) {
               }
           }
           
-          window.location.reload(false);
+          //window.location.reload(false);
 
       })
       .catch((error) => {
@@ -120,6 +121,7 @@ export default function MyCreatedActivityCard({ activity }) {
     
     const handleClickMore = (event) => {
       setAnchorEl(event.currentTarget);
+      localStorage.setItem('activityId', activity.id);
     };
     
     const handleCloseMore = () => {
