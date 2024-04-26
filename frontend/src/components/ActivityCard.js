@@ -44,7 +44,7 @@ export default function ActivityCard({ activity }) {
     };
 
 
-    console.log(`groupName: ${activity.ActivityGroup.Group.groupName}`);
+    // console.log(`groupName: ${activity.ActivityGroup.Group.groupName}`);
     return (
     <div>
         <Item>

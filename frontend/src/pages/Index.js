@@ -40,6 +40,7 @@ export default function Index() {
           },
         });
         setActivities(fetchData.data);
+        console.log("fetchData: ", fetchData.data)
       } catch (err) {
         // console.log(err);
       }
@@ -66,7 +67,7 @@ export default function Index() {
 
   return (
     <div className="home-container">
-      <IndexPage_Navbar />
+      <IndexPage_Navbar callback_setActivities={setActivities}/>
       <h2>我們的探究活動</h2>
       <Box sx={{ maxWidth: 120 }} className="activity-status">
         <FormControl fullWidth>
