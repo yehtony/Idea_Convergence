@@ -143,6 +143,7 @@ export default function Forum() {
     // console.log("fetchEdge: ", fetchEdge);
 
     const nodeData = fetchData.data[0].Nodes.map((node) => genNode(node));
+    console.log('nodeData: ', nodeData);
 
     const edgeData = fetchEdge.data.map((edge) => genEdge(edge));
 
@@ -380,7 +381,7 @@ export default function Forum() {
 
   return (
     <div className="home-container">
-      <ForumPage_Navbar ws={ws} />
+      <ForumPage_Navbar ws={ws} nodeContent={nodeContent} />
       <div
         id="graph"
         style={{

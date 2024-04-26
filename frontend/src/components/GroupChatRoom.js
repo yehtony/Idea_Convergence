@@ -29,8 +29,10 @@ import config from '../config.json';
 import { newMessage } from '../utils/ideaTool';
 
 export const GroupChatRoom = ({ activityData }) => {
+  const [type, setType] = useState('idea_convergent');
+  const [stage, setStage] = useState('stage_one');
   const [ws, setSocket] = useState(null);
-  const [nodeData, setNodeData] = useState([]);
+  const [nodeData, setNodeData] = useState(null);
   const [topic, setTopic] = useState('');
   const [activity, setActivity] = useState(activityData);
   // const [summary, setSummary] = useState();
@@ -48,27 +50,26 @@ export const GroupChatRoom = ({ activityData }) => {
   //     );
   //     // const nodeData = fetchData.data.Nodes.map(
   //     //   (node) => `${node.title}:${node.content}`
-  //     // ).join('\n');
-  //     const nodeDataList = fetchData.data.Nodes.map(
+  //     const nodeDataList = await fetchData.data.Nodes.map(
   //       (node) => `${node.title}:${node.content}`
   //     );
   //     // console.log(nodeData);
-  //     setNodeData(await nodeDataList);
-  //     console.log(nodeData);
-  //     try {
-  //       const response = await axios.post(
-  //         'http://127.0.0.1:8000/nlp/idea/summarize',
-  //         {
-  //           message: nodeData,
-  //         }
-  //       );
-  //       console.log('NLP server response:', response.data);
-  //       // setSummary(response.data);
-  //       return response.data;
-  //     } catch (error) {
-  //       console.error('Error sending message to NLP server:', error);
-  //       return false;
-  //     }
+  //     setNodeData(nodeDataList);
+  //     console.log(nodeDataList);
+  //     // try {
+  //     //   const response = await axios.post(
+  //     //     'http://127.0.0.1:8000/nlp/idea/summarize',
+  //     //     {
+  //     //       message: nodeData,
+  //     //     }
+  //     //   );
+  //     //   console.log('NLP server response:', response.data);
+  //     //   // setSummary(response.data);
+  //     //   return response.data;
+  //     // } catch (error) {
+  //     //   console.error('Error sending message to NLP server:', error);
+  //     //   return false;
+  //     // }
   //   } catch (error) {
   //     console.error('Error fetching nodes:', error.message);
   //   }
@@ -82,7 +83,7 @@ export const GroupChatRoom = ({ activityData }) => {
   const [messageList, setMessageList] = useState([
     {
       content:
-        '哈囉各位同學，請問是你們主動想進行 Meta-Talk，還是老師需要你們進行 Meta-Talk 呢？',
+        '看來你們需要進行想法收斂的 Meta-Talk，請你們進行小組討論並且摘要出你們在這個探究活動所提出的想法，並且在聊天室提出你們摘要後的想法。',
       groupId: groupId,
       author: 'assistant',
     },
@@ -113,7 +114,7 @@ export const GroupChatRoom = ({ activityData }) => {
     content: message,
   });
   const [sendActivityTitle, setSendActivityTitle] = useState(false);
-  const [scaffold, setScaffold] = useState(['老師', '我們']);
+  const [scaffold, setScaffold] = useState(['我們摘要出的想法：']);
   const buttonGroupRef = useRef(null);
   const [buttonGroupHeight, setButtonGroupHeight] = useState(0);
 
@@ -139,23 +140,21 @@ export const GroupChatRoom = ({ activityData }) => {
     if (checkGroupMessage === true) {
       try {
         const response = await axios.post(
-          'http://ml.hsueh.tw:8000/Xuan/NLP/idea_convergent/stage_one',
+          `http://ml.hsueh.tw:8000/Xuan/NLP/${type}/${stage}`,
           messageListTemp
         );
 
         console.log('NLP server response:', response.data);
         let messageData;
-        if (response.data.buttons && response.data.buttons.length > 0) {
-          const buttonTitles = response.data.buttons.map(
-            (button) => button.title
-          );
+        if (response.data.button && response.data.button.length > 0) {
+          const buttonTitles = response.data.button.map((button) => button);
           setScaffold(buttonTitles);
           messageData = {
             userId: data.userId,
             groupId: groupId,
             author: 'assistant',
             content: response.data.message,
-            buttons: buttonTitles,
+            button: buttonTitles,
           };
           // console.log(messageData.buttons);
         } else {
@@ -178,6 +177,8 @@ export const GroupChatRoom = ({ activityData }) => {
         //   topic: topic,
         //   message: '',
         // });
+        setType(response.data.type);
+        setStage(response.data.stage);
         return response.data;
       } catch (error) {
         console.error('Error sending message to NLP server:', error);
@@ -190,14 +191,31 @@ export const GroupChatRoom = ({ activityData }) => {
   // Check Personal Message
   const checkMessage = async () => {
     // console.log(messageList);
-    const messageqa = questionMessage.concat(message);
-    console.log(messageqa);
+    // const messageqa = questionMessage.concat(message);
+    // console.log(messageqa);
+    // try {
+    //   const response = await axios.post(
+    //     `http://ml.hsueh.tw:8000/Xuan/NLP/message/check`,
+    //     {
+    //       message: messageqa,
+    //     }
+    //   );
+    //   console.log('NLP server response:', response.data);
+    //   return response.data;
+    // } catch (error) {
+    //   console.error('Error sending message to NLP server:', error);
+    //   return false;
+    // }
+
+    const messagecheck = {
+      message: message,
+      topic: topic,
+    };
+    console.log('message_check', messagecheck);
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/nlp/message/check',
-        {
-          message: messageqa,
-        }
+        `http://ml.hsueh.tw:8000/Xuan/NLP/message/check`,
+        messagecheck
       );
       console.log('NLP server response:', response.data);
       return response.data;
@@ -211,9 +229,8 @@ export const GroupChatRoom = ({ activityData }) => {
   const sendMessage = async () => {
     if (message !== '') {
       const checkMessageResult = await checkMessage();
-      const isAllTrue = checkMessageResult.every(
-        (item) => item.result === true
-      );
+      console.log(checkMessageResult);
+      const isAllTrue = checkMessageResult.check === true;
       if (isAllTrue) {
         const messageData = {
           userId: data.userId,
@@ -234,15 +251,13 @@ export const GroupChatRoom = ({ activityData }) => {
         // console.log(messageListTemp)
         setMessage('');
       } else {
-        checkMessageResult.forEach((item, index) => {
-          if (item.result) {
-            setMessageAlert((prev) => [
-              ...prev,
-              alertMessage[index][0] + item.content + alertMessage[index][1],
-            ]);
-            // console.log(messageAlert);
-          }
-        });
+        // checkMessageResult.forEach((item, index) => {
+        //   if (item.check) {
+        //     setMessageAlert((prev) => [...prev, item.message]);
+        //     // console.log(messageAlert);
+        //   }
+        // });
+        setMessageAlert((prev) => [...prev, checkMessageResult.message]);
         setMessageAlertCheck(false);
         // setMessageAlert(messageToAlert);
         console.log('send message', messageAlert);
@@ -252,41 +267,63 @@ export const GroupChatRoom = ({ activityData }) => {
 
   useEffect(() => {
     setSocket(io.connect(url.socketioHost));
+    async function getNode() {
+      await getNodes();
+      // setSocket(io.connect(url.socketioHost));
+    }
+    getNode();
   }, []);
 
-  // useEffect(() => {
-  //   if (activityData) {
-  //     setTopic(activityData.title);
-  //     setMessageListTemp({
-  //       // sender: groupId,
-  //       topic: '生活中的聲音如何產生',
-  //       message: '',
-  //     });
-  //     console.log(activityData.title);
-  //   }
-  // }, [activityData]);
+  useEffect(() => {
+    if (activityData) {
+      setTopic(activityData.title);
+      setMessageListTemp({
+        // sender: groupId,
+        topic: '生活中的聲音如何產生',
+        message: '',
+      });
+      console.log(activityData.title);
+    }
+  }, [activityData, nodeData]);
+
+  const getNodes = async () => {
+    try {
+      const fetchData = await axios.get(
+        `${url.backendHost + config[8].getNode}/${localStorage.getItem(
+          'groupId'
+        )}`,
+        {
+          headers: {
+            authorization: 'Bearer JWT Token',
+          },
+        }
+      );
+
+      if (fetchData.data && fetchData.data[0].Nodes) {
+        const nodeDataList = fetchData.data[0].Nodes.map(
+          (node) => `${node.title}:${node.content}`
+        );
+        setNodeData(nodeDataList);
+        console.log(nodeDataList);
+      } else {
+        console.log('No nodes data available');
+        setNodeData([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch nodes:', error);
+    }
+  };
 
   useEffect(() => {
-    // if (buttonGroupRef.current) {
-    //   const height = buttonGroupRef.current.clientHeight;
-    //   setButtonGroupHeight(height);
-    // }
     if (ws && activityData) {
       console.log('initWebSocket');
       setMessageListTemp({
         // sender: groupId,
         topic: activityData.title,
         message: '',
+        idea: nodeData,
       });
-
-      // ws.on('connect', () => {
-      //   console.log('WebSocket connected');
-      // });
-
-      // if (sendActivityTitle === false) {
-      //   getNodes();
-      // }
-      function receive_message(data) {
+      const receive_message = async (data) => {
         setMessageList((prev) => [...prev, data]);
         if (data.author !== 'assistant') {
           setMessageListTemp((prev) => ({
@@ -299,9 +336,10 @@ export const GroupChatRoom = ({ activityData }) => {
             // sender: groupId,
             topic: activityData.title,
             message: '',
+            idea: nodeData,
           });
-          if (data.buttons) {
-            setScaffold(data.buttons);
+          if (data.button) {
+            setScaffold(data.button);
             if (buttonGroupRef.current) {
               const height = buttonGroupRef.current.clientHeight;
               setButtonGroupHeight(height);
@@ -312,22 +350,8 @@ export const GroupChatRoom = ({ activityData }) => {
         }
         // setCheckGroupMessage(true);
         setSendActivityTitle(true);
-      }
-      if (chatRoomOpen === true) {
-        // socket.emit('joinRoom', data.groupId);
-        // console.log('joinRoom', data.groupId);
-      }
-      // socket.on(`message-receive-${groupId}`, receive_message);
+      };
       ws.on(`message-receive-${groupId}`, receive_message);
-      // return () => {
-      //   ws.off('message-receive-${groupId}', receive_message);
-      //   // socket.disconnect(); // 斷開socket連接
-      // };
-      // return () => {
-      //   if (ws) {
-      //     ws.off('connect');
-      //   }
-      // };
     }
   }, [ws, activityData]);
 
@@ -364,11 +388,11 @@ export const GroupChatRoom = ({ activityData }) => {
     // socket.emit('sendMessage', messageData);
     // console.log('send message', messageData);
     newMessage(messageData, ws);
-    setMessageList((prev) => [...prev, messageData]);
-    setMessageListTemp((prev) => ({
-      ...prev,
-      message: prev.message + '\n' + message,
-    }));
+    // setMessageList((prev) => [...prev, messageData]);
+    // setMessageListTemp((prev) => ({
+    //   ...prev,
+    //   message: prev.message + '\n' + message,
+    // }));
     setMessage('');
   };
   const doubleCheckNo = () => {
