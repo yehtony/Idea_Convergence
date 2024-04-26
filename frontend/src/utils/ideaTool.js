@@ -108,7 +108,7 @@ export const newMessage = async (messageData, ws) => {
     .then((response) => {
       console.log('newMessage');
       console.log(response.data.chatRoomMessage);
-      sendNewChatRoomMessage(ws, response.data.chatRoomMessage);
+      sendNewChatRoomMessage(ws, messageData);
       console.log('sendNewChatRoomMessage');
       return response;
     });

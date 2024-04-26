@@ -155,6 +155,8 @@ export const GroupChatRoom = ({ activityData }) => {
             author: 'assistant',
             content: response.data.message,
             button: buttonTitles,
+            type: response.data.type,
+            stage: response.data.stage,
           };
           // console.log(messageData.buttons);
         } else {
@@ -164,6 +166,8 @@ export const GroupChatRoom = ({ activityData }) => {
             groupId: groupId,
             author: 'assistant',
             content: response.data.message,
+            type: response.data.type,
+            stage: response.data.stage,
           };
           // console.log(messageData);
         }
@@ -177,8 +181,6 @@ export const GroupChatRoom = ({ activityData }) => {
         //   topic: topic,
         //   message: '',
         // });
-        setType(response.data.type);
-        setStage(response.data.stage);
         return response.data;
       } catch (error) {
         console.error('Error sending message to NLP server:', error);
@@ -258,6 +260,8 @@ export const GroupChatRoom = ({ activityData }) => {
         //   }
         // });
         setMessageAlert((prev) => [...prev, checkMessageResult.message]);
+
+        console.log(checkMessageResult);
         setMessageAlertCheck(false);
         // setMessageAlert(messageToAlert);
         console.log('send message', messageAlert);
@@ -315,7 +319,7 @@ export const GroupChatRoom = ({ activityData }) => {
   };
 
   useEffect(() => {
-    if (ws && activityData) {
+    if (activityData) {
       console.log('initWebSocket');
       setMessageListTemp({
         // sender: groupId,
@@ -338,15 +342,20 @@ export const GroupChatRoom = ({ activityData }) => {
             message: '',
             idea: nodeData,
           });
+          console.log(data);
           if (data.button) {
             setScaffold(data.button);
             if (buttonGroupRef.current) {
               const height = buttonGroupRef.current.clientHeight;
               setButtonGroupHeight(height);
             }
+          } else {
+            setScaffold([]);
           }
           setQuestionMessage([data.message]);
           setCheckGroupMessage(false);
+          setType(data.type);
+          setStage(data.stage);
         }
         // setCheckGroupMessage(true);
         setSendActivityTitle(true);
@@ -555,7 +564,7 @@ export const GroupChatRoom = ({ activityData }) => {
                   marginLeft: '10px', // 将文字靠左
                 }}
               >
-                回覆鷹架按鈕（請務必使用回覆鷹架）：
+                回覆鷹架按鈕（建議使用回覆鷹架）：
               </div>
               <ButtonGroup
                 ref={buttonGroupRef}
