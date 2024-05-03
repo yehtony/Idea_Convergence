@@ -22,9 +22,9 @@ export const Login = () => {
     useEffect(() => {
         // Checking if user is loggedIn
         if(isLoggedIn && role === 'student'){
-            navigate("/index");
+            navigate("/home");
         } else if (isLoggedIn && role === 'teacher'){
-            navigate("/teacher/index");
+            navigate("/teacher/home");
         } else {
             navigate("/");
         }
