@@ -149,7 +149,7 @@ export default function ForumPage_Navbar({ ws }) {
   useEffect(() => {
     const getActivityData = async () => {
       try {
-        const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${localStorage.getItem('activityId')}`);
+        const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${sessionStorage.getItem('activityId')}`);
         setActivityData(response.data);
       } catch (err) {
         // console.log(err);
