@@ -653,7 +653,7 @@ span{
   flex-wrap: wrap;
   justify-content: center;
 }
-.chart-total-container {
+#author-tag-chart {
   max-width: 650px;
   margin: 35px auto;
   text-align: center; 
@@ -692,6 +692,7 @@ div.vis-network div.vis-navigation div.vis-button.vis-zoomOut {
   left: 20px!important;
   height: 40px !important;
   width: 40px !important;
+  
 }
 
 div.vis-network div.vis-navigation div.vis-button.vis-zoomIn {
@@ -709,4 +710,5 @@ div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends {
   height: 90px !important;
   right: 15px !important;
   width: 90px !important;
+  border-radius: 10px !important;
 }
