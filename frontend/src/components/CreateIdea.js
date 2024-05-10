@@ -55,7 +55,7 @@ export const CreateIdea = ({ open, onClose, ws }) => {
       content: "",
       tags: "idea",
       author: name,
-      groupId: localStorage.getItem('groupId')
+      groupId: sessionStorage.getItem('groupId')
     }
 
     const [data, setData] = useState(nodeDefault);
@@ -119,7 +119,7 @@ export const CreateIdea = ({ open, onClose, ws }) => {
       };
       setLoading(true);
       try {
-        await newNode(ideaData, localStorage.getItem('activityId'), ws);
+        await newNode(ideaData,sessionStorage.getItem('activityId'), ws);
         alert("新增成功");
         onClose(onClose);
         setLoading(false);
