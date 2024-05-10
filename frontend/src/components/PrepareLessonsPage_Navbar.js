@@ -158,7 +158,7 @@ export default function PrepareLessonsPage_Navbar() {
                   size="large"
                   aria-label="show 4 new mails"
                   color="inherit"
-                  onClick={()=>{ navigate('/teacher/index') }}
+                  onClick={()=>{ navigate('/teacher/home') }}
                 >
                   <Badge color="error">
                     <img alt='返回首頁' src={BackToHomeIcon} width={24} height={24} />

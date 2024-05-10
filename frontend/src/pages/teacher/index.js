@@ -66,7 +66,7 @@ export default function IndexOfTeacher() {
 
   return (
     <div className="home-container">
-      <IndexPage_Navbar />
+      <IndexPage_Navbar callback_setActivities={setActivities}/>
       <h2>我建立的探究活動</h2>
       <Box sx={{ maxWidth: 120 }} className="activity-status">
         <FormControl fullWidth>

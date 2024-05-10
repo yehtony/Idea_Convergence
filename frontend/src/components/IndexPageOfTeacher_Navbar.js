@@ -48,7 +48,7 @@ function DropdownItem(props){
     );
 }
 
-export default function IndexPageOfTeacher_Navbar() {
+export default function IndexPageOfTeacher_Navbar({ callback_setActivities }) {
     const singOut = useSignOut();
     const navigate = useNavigate();
 
@@ -93,10 +93,10 @@ export default function IndexPageOfTeacher_Navbar() {
             </div>
             <div className='nav-buttons'>
                 <button className='create-activity-button'>
-                    <CreateActivityForm/>
+                    <CreateActivityForm callback_setActivities={callback_setActivities} />
                 </button>
                 <button className='join-activity-button'>
-                    <JoinActivityForm/>
+                    <JoinActivityForm callback_setActivities={callback_setActivities} />
                 </button>
                 <div className="menu-trigger" onClick={() => { setOpen(!open) }}>
                     <Avatar {...stringAvatar(name)} />

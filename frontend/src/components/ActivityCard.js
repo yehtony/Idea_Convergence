@@ -82,4 +82,5 @@ export default function ActivityCard({ activity }) {
             </Item>
         </div>
     );
+
 }
