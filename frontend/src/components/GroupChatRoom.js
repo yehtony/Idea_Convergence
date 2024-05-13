@@ -279,16 +279,16 @@ export const GroupChatRoom = ({ activityData }) => {
   }, []);
 
   useEffect(() => {
-    if (activityData) {
-      setTopic(activityData.title);
-      setMessageListTemp({
+    if (nodeData) {
+      // setTopic(activityData.title);
+      setMessageListTemp((prev) => ({
+        ...prev,
         // sender: groupId,
-        topic: '生活中的聲音如何產生',
-        message: '',
-      });
+        idea: nodeData,
+      }));
       console.log(activityData.title);
     }
-  }, [activityData, nodeData]);
+  }, [nodeData]);
 
   const getNodes = async () => {
     try {
@@ -320,13 +320,20 @@ export const GroupChatRoom = ({ activityData }) => {
 
   useEffect(() => {
     if (activityData) {
+      setTopic(activityData.title);
       console.log('initWebSocket');
-      setMessageListTemp({
-        // sender: groupId,
+      // setTopic(activityData.title);
+      setMessageListTemp((prev) => ({
+        ...prev,
         topic: activityData.title,
         message: '',
-        idea: nodeData,
-      });
+      }));
+      // setMessageListTemp({
+      //   // sender: groupId,
+      //   topic: activityData.title,
+      //   message: '',
+      //   idea: nodeData,
+      // });
       const receive_message = async (data) => {
         setMessageList((prev) => [...prev, data]);
         if (data.author !== 'assistant') {
@@ -336,12 +343,10 @@ export const GroupChatRoom = ({ activityData }) => {
           }));
           setCheckGroupMessage(true);
         } else {
-          setMessageListTemp({
-            // sender: groupId,
-            topic: activityData.title,
+          setMessageListTemp((prev) => ({
+            ...prev,
             message: '',
-            idea: nodeData,
-          });
+          }));
           console.log(data);
           if (data.button) {
             setScaffold(data.button);
