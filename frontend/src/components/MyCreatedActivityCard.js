@@ -285,20 +285,11 @@ export default function MyCreatedActivityCard({ activity }) {
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          <Button className='enter-activity-button' onClick={handleExpandClick}>
-            展開小組列表
-          </Button>
-          <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-            sx={{
-              fontSize: 42,
-            }}
-          >
-            <ExpandMoreIcon />
-          </ExpandMore>
+          <div style={{ marginLeft: 'auto' }}>
+            <Button className='enter-activity-button' onClick={handleExpandClick}>
+              展開小組列表
+            </Button>
+          </div>
         </CardActions>
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <List
@@ -314,7 +305,7 @@ export default function MyCreatedActivityCard({ activity }) {
                 disablePadding
                 secondaryAction={
                   <EnterActivity>
-                                <Button className='enter-activity-button' onClick={(e) => {localStorage.setItem('groupId', group.id); localStorage.setItem('joinCode', group.joinCode); handleEnter(e);}}>
+                    <Button className='enter-activity-button' onClick={(e) => { localStorage.setItem('groupId', group.id); localStorage.setItem('joinCode', group.joinCode); handleEnter(e); }}>
                       進入小組
                     </Button>
                   </EnterActivity>

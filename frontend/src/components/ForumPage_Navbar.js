@@ -158,7 +158,14 @@ export default function ForumPage_Navbar({ ws }) {
 
     getActivityData();
   }, []);
+    // 從 sessionStorage 中讀取 groupId
+    const groupId = sessionStorage.getItem('groupId');
 
+    // 尋找與 groupId 對應的小組
+    const group = activityData?.Groups.find(group => group.id === parseInt(groupId));
+
+    // 獲取小組名稱
+    const groupName = group?.groupName;
   return (
     <nav>
       {/* <AppBar position="fixed" open={open} style={{ background: 'transparent', boxShadow: 'none'}}> */}
@@ -192,6 +199,7 @@ export default function ForumPage_Navbar({ ws }) {
             {activityData && (    // ensure that activityData is not null or undefined before trying to access its properties.
               <>
                 {activityData.title}
+                {groupName && ` - ${groupName}`} {/* 如果存在 groupName，則顯示在標題後面 */}
               </>
             )}
           </Typography>
@@ -295,8 +303,8 @@ export default function ForumPage_Navbar({ ws }) {
         />
       )}
       {selectedModal === 'createLearningFeedback' && (
-        // navigate("/dashboard")
-        openInNewTab("./dashboard")
+        navigate("/dashboard")
+        //openInNewTab("./dashboard")
       )}
       {/* {selectedModal === 'backToForum' && (
         navigate("/forum")
