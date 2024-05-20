@@ -16,8 +16,8 @@ export default function App() {
         <Routes>
             <Route path='/' element={[<Home/>, <About/>, <Footer/>]}></Route>
             <Route path='/about' element={<About/>}></Route>
-            <Route path='/index' element={<RequireAuth loginPath='/'><Index/></RequireAuth>}></Route>
-            <Route path='/teacher/index' element={<RequireAuth loginPath='/'><IndexOfTeacher/></RequireAuth>}></Route>
+            <Route path='/home' element={<RequireAuth loginPath='/'><Index/></RequireAuth>}></Route>
+            <Route path='/teacher/home' element={<RequireAuth loginPath='/'><IndexOfTeacher/></RequireAuth>}></Route>
             <Route path='/forum' element={<RequireAuth loginPath='/'><Forum/></RequireAuth>}></Route>
             <Route path='/dashboard' element={<RequireAuth loginPath='/'><Dashboard/></RequireAuth>}></Route>
             <Route path='/teacher/pageOfPrepareLesson' element={<RequireAuth loginPath='/'><PrepareLessons/></RequireAuth>}></Route>

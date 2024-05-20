@@ -7,19 +7,19 @@ import { Favorite } from '@mui/icons-material';
 import { Button } from '@mui/base';
 
 const Item = styled(Card)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#E3DFFD',
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  color: theme.palette.text.secondary,
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#E3DFFD',
+    ...theme.typography.body2,
+    padding: theme.spacing(2),
+    color: theme.palette.text.secondary,
 }));
 
 const EnterActivity = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
-  })(({ theme }) => ({
+})(({ theme }) => ({
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
+        duration: theme.transitions.duration.shortest,
     }),
 }));
 
@@ -39,35 +39,48 @@ export default function ActivityCard({ activity }) {
 
     const handleEnter = async (e) => {
         e.preventDefault();
-        localStorage.setItem('activityId', activity.ActivityGroup.Activity.id);
-        navigate("/forum");
+        console.log(activity.ActivityGroup.Activity.id, activity.ActivityGroup.GroupId, activity.ActivityGroup.Group.joinCode);
+
+        const { Activity, Group } = activity.ActivityGroup;
+
+        localStorage.setItem('activityId', Activity.id);
+        localStorage.setItem('groupId', Group.groupId);
+        localStorage.setItem('joinCode', Group.joinCode);
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const value = localStorage.getItem(key);
+            sessionStorage.setItem(key, value);
+          }
+          navigate("/forum");
     };
 
 
-    console.log(`groupName: ${activity.ActivityGroup.Group.groupName}`);
+    // console.log(`groupName: ${activity.ActivityGroup.Group.groupName}`);
     return (
-    <div>
-        <Item>
-            <CardHeader
-                title={activity.ActivityGroup.Activity.title}      
-                subheader={activity.ActivityGroup.Group.groupName ?? ''}   
-            />
-            <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                    {`${formatTimestamp(activity.ActivityGroup.Activity.startDate)} ~ ${formatTimestamp(activity.ActivityGroup.Activity.endDate)}`}
-                </Typography>
-            </CardContent>
-            <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <Favorite />
-                </IconButton>
-                <EnterActivity>
-                    <Button className='enter-activity-button' onClick={handleEnter}>
-                        進入課程
-                    </Button>
-                </EnterActivity>
-            </CardActions>
-        </Item>
-    </div>
-  );
+        <div>
+            <Item>
+                <CardHeader
+                    title={activity.ActivityGroup.Activity.title}
+                    subheader={activity.ActivityGroup.Group.groupName ?? ''}
+                />
+                <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                        {`${formatTimestamp(activity.ActivityGroup.Activity.startDate)} ~ ${formatTimestamp(activity.ActivityGroup.Activity.endDate)}`}
+                    </Typography>
+                </CardContent>
+                <CardActions disableSpacing>
+                    <IconButton aria-label="add to favorites">
+                        <Favorite />
+                    </IconButton>
+                    <EnterActivity>
+                        <Button className='enter-activity-button' onClick={handleEnter}>
+                            進入課程
+                        </Button>
+                    </EnterActivity>
+                </CardActions>
+            </Item>
+        </div>
+    );
+
 }

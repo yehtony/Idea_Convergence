@@ -9,9 +9,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import createActivityImg from '../assets/undraw_creative_thinking_re_9k71.svg';
 import url from '../url.json';
 
-export const CreateActivityForm = () => {
-    const userId = localStorage.getItem('userId'); 
-    const [open, setOpen] = useState(false);
+export const CreateActivityForm = ({ callback_setActivities }) => {
+    const userId = localStorage.getItem('userId');
+        const [open, setOpen] = useState(false);
     const [startDate, setStartDate] = useState(dayjs('2023-12-10'));
     const [endDate, setEndDate] = useState(dayjs('2023-12-10'));
     const [data, setData] = useState({
@@ -54,9 +54,9 @@ export const CreateActivityForm = () => {
                     startDate: "",
                     endDate: ""
                 })
+                callback_setActivities((prev) => [...prev, response.data]);
                 // console.log(response.status, response.data);
                 alert("建立成功");
-                window.location.reload(false);
             })
             .catch((error) => {
                 alert("建立失敗");

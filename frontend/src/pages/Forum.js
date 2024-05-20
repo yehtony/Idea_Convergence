@@ -9,6 +9,7 @@ import url from '../url.json';
 import { genEdge, genNode } from '../utils/ideaTool';
 
 export default function Forum() {
+ 
   const [graph, setGraph] = useState({
     nodes: [],
     edges: [],
@@ -17,7 +18,8 @@ export default function Forum() {
   const [open, setOpen] = useState(false);
   const [nodeContent, setNodeContent] = useState(null);
   const [ws, setSocket] = useState(null);
-  const activityId = localStorage.getItem('activityId');
+  const activityId = sessionStorage.getItem('activityId')
+
 
   const handleClickOpen = (nodeId) => {
     setNodeContent(null);
@@ -43,13 +45,9 @@ export default function Forum() {
 
   //取得 groupId, 並在其後 render getNodes()
   const fetchGroupData = async () => {
-    const enterDifferentGroupEndpoint = `${url.backendHost}${
-      config[16].EnterDifferentGroup
-    }${localStorage.getItem('joinCode')}/${localStorage.getItem('userId')}`;
-    const getMyGroupEndpoint = `${url.backendHost}${
-      config[12].getMyGroup
-    }/${localStorage.getItem('activityId')}/${localStorage.getItem('userId')}`;
-
+    const enterDifferentGroupEndpoint = `${url.backendHost}${config[16].EnterDifferentGroup}${sessionStorage.getItem('joinCode')}/${sessionStorage.getItem('userId')}`;
+    const getMyGroupEndpoint = `${url.backendHost}${config[12].getMyGroup}/${sessionStorage.getItem('activityId')}/${sessionStorage.getItem('userId')}`;
+  
     try {
       const response = await axios.get(enterDifferentGroupEndpoint, {
         headers: {
@@ -57,7 +55,9 @@ export default function Forum() {
         },
       });
       // console.log("1. groupData:response ", response.data.data[0].id);
-      localStorage.setItem('groupId', response.data.data[0].id);
+      const groupId = response.data.data[0].id;
+      localStorage.setItem('groupId', groupId);
+      sessionStorage.setItem('groupId', groupId);
     } catch (error) {
       try {
         const response = await axios.get(getMyGroupEndpoint, {
@@ -66,15 +66,19 @@ export default function Forum() {
           },
         });
         // console.log("1. groupData:response ", response.data.data[0].id);
-        localStorage.setItem('groupId', response.data.data[0].id);
+        const groupId = response.data.data[0].id;
+        localStorage.setItem('groupId', groupId);
+        sessionStorage.setItem('groupId', groupId);
       } catch (error) {
         console.error('Error fetching group data', error);
       }
     } finally {
       await getNodes();
+      
     }
   };
   useEffect(() => {
+    
     async function fetchData() {
       await fetchGroupData();
       setSocket(io.connect(url.socketioHost));
@@ -90,16 +94,16 @@ export default function Forum() {
       });
 
       ws.on(`node-recieve-${activityId}`, (body) => {
-        if (body.groupId == localStorage.getItem('groupId')) {
-          setGraph((graph) => ({
-            nodes: [...graph.nodes, genNode(body)],
+        if(body.groupId==sessionStorage.getItem('groupId')){
+          setGraph(graph => ({
+            nodes: [...graph.nodes,genNode(body)],
             edges: graph.edges,
           }));
         }
       });
       ws.on(`edge-recieve-${activityId}`, (body) => {
-        if (body.groupId == localStorage.getItem('groupId')) {
-          setGraph((graph) => ({
+        if(body.groupId==sessionStorage.getItem('groupId')){
+          setGraph(graph =>({
             nodes: graph.nodes,
             edges: [...graph.edges, genEdge(body)],
           }));
@@ -109,7 +113,7 @@ export default function Forum() {
   }, [ws]);
 
   const getNodes = async () => {
-    if (localStorage.getItem('groupId') == null) {
+    if(sessionStorage.getItem('groupId')==null){
       const asyncFn = async () => {
         await fetchGroupData();
       };
@@ -117,27 +121,18 @@ export default function Forum() {
       asyncFn();
     }
 
-    const fetchData = await axios.get(
-      `${url.backendHost + config[8].getNode}/${localStorage.getItem(
-        'groupId'
-      )}`,
-      {
-        headers: {
-          authorization: 'Bearer JWT Token',
-        },
-      }
-    );
+    const fetchData = await axios.get(`${url.backendHost + config[8].getNode}/${sessionStorage.getItem('groupId')}`, {
+      
+      headers: {
+        authorization: 'Bearer JWT Token',
+      },
+    });
 
-    const fetchEdge = await axios.get(
-      `${url.backendHost + config[10].getEdge}/${localStorage.getItem(
-        'groupId'
-      )}`,
-      {
-        headers: {
-          authorization: 'Bearer JWT Token',
-        },
-      }
-    );
+    const fetchEdge = await axios.get(`${url.backendHost + config[10].getEdge}/${sessionStorage.getItem('groupId')}`, {
+      headers: {
+        authorization: 'Bearer JWT Token',
+      },
+    });
 
     console.log('fetchData: ', fetchData);
     // console.log("fetchEdge: ", fetchEdge);
@@ -149,7 +144,7 @@ export default function Forum() {
 
     console.log('nodeData: ', nodeData);
     console.log('edgeData: ', edgeData);
-    localStorage.setItem('nodeDataLength', nodeData.length + 1);
+    sessionStorage.setItem("nodeDataLength", nodeData.length + 1);
     setGraph({
       nodes: nodeData,
       edges: edgeData,
@@ -374,7 +369,7 @@ export default function Forum() {
       // console.log(`events:targetNodes`,event.nodes);
       if (event.nodes.length === 1) {
         handleClickOpen(event.nodes[0]);
-        localStorage.setItem('nodeId', event.nodes[0]);
+        sessionStorage.setItem('nodeId', event.nodes[0]);
       }
     },
   };

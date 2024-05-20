@@ -5,13 +5,25 @@ import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentT
 import joinActivityImg from '../assets/undraw_join_re_w1lh.svg';
 import url from '../url.json';
 
-export const JoinActivityForm = () => {
+export const JoinActivityForm = ({ callback_setActivities }) => {
     const userId = localStorage.getItem('userId'); 
     const [open, setOpen] = React.useState(false);
     const [data, setData] = useState({
         userId: userId,
         joinCode: ""
     });
+    const [activityData, setActivityData] = useState({
+        ActivityGroup:{
+            Activity: {
+                createdAt: '',
+                endDate: '',
+                title: ''
+            },
+            Group: {
+                groupName: ''
+            }
+        }
+    })
     
     const handleClickOpen = () => {
         setOpen(true);
@@ -36,14 +48,23 @@ export const JoinActivityForm = () => {
         };
         axios
             .put(`${url.backendHost + config[5].joinActivity}/${data.joinCode}/join`, activityData)
-            .then((response) => {
-                setOpen(false);
-                setData({
-                    joinCode: ""
-                })
-                alert("成功加入活動!");
-                // console.log(response.status, response.data);
-                window.location.reload(false);
+            .then((groupRes) => {
+
+                axios.get(`${url.backendHost + config[4].myJoinedActivityList}/${data.userId}`, {
+                    headers: {
+                      authorization: 'Bearer JWT Token',
+                    },
+                  }).then((fetchData)=>{
+                    callback_setActivities(fetchData.data);
+                    console.log(`fetchdata-response: ${fetchData.data}`);
+                    setOpen(false);
+                    setData({
+                        joinCode: ""
+                    });
+                    alert("成功加入活動!");
+                  }).catch((error) => {
+                        alert("取得活動失敗...");
+                  })
             })
             .catch((error) => {
                 alert("加入活動失敗 請確認邀請碼!");

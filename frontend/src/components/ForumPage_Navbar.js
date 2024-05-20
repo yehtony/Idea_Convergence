@@ -167,12 +167,7 @@ export default function ForumPage_Navbar({ ws }) {
   useEffect(() => {
     const getActivityData = async () => {
       try {
-        const response = await axios.get(
-          `${url.backendHost + config[6].enterActivity}/${localStorage.getItem(
-            'activityId'
-          )}`
-        );
-        console.log(response.data);
+        const response = await axios.get(`${url.backendHost + config[6].enterActivity}/${sessionStorage.getItem('activityId')}`);
         setActivityData(response.data);
       } catch (err) {
         // console.log(err);
@@ -181,7 +176,14 @@ export default function ForumPage_Navbar({ ws }) {
 
     getActivityData();
   }, []);
+    // 從 sessionStorage 中讀取 groupId
+    const groupId = sessionStorage.getItem('groupId');
 
+    // 尋找與 groupId 對應的小組
+    const group = activityData?.Groups.find(group => group.id === parseInt(groupId));
+
+    // 獲取小組名稱
+    const groupName = group?.groupName;
   return (
     <nav>
       {/* <AppBar position="fixed" open={open} style={{ background: 'transparent', boxShadow: 'none'}}> */}
@@ -227,15 +229,12 @@ export default function ForumPage_Navbar({ ws }) {
               </Badge>
             </IconButton>
           </Tooltip>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            color="black"
-            fontWeight="bolder"
-          >
-            {activityData && ( // ensure that activityData is not null or undefined before trying to access its properties.
-              <>{activityData.title}</>
+          <Typography variant="h6" noWrap component="div"  color="black" fontWeight="bolder">
+            {activityData && (    // ensure that activityData is not null or undefined before trying to access its properties.
+              <>
+                {activityData.title}
+                {groupName && ` - ${groupName}`} {/* 如果存在 groupName，則顯示在標題後面 */}
+              </>
             )}
           </Typography>
           {/* <Box sx={{ flexGrow: 1 }} />
@@ -332,9 +331,10 @@ export default function ForumPage_Navbar({ ws }) {
       {selectedModal === 'createNote' && (
         <CreateNote open={openModal} onClose={closeModal} ws={ws} />
       )}
-      {selectedModal === 'createLearningFeedback' &&
-        // navigate("/dashboard")
-        openInNewTab('./dashboard')}
+      {selectedModal === 'createLearningFeedback' && (
+        navigate("/dashboard")
+        //openInNewTab("./dashboard")
+      )}
       {/* {selectedModal === 'backToForum' && (
         navigate("/forum")
       )} */}
