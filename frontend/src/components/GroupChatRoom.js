@@ -216,7 +216,7 @@ export const GroupChatRoom = ({ activityData }) => {
     console.log('message_check', messagecheck);
     try {
       const response = await axios.post(
-        `http://ml.hsueh.tw:8000/Xuan/NLP/message/check`,
+        `http://ml.hsueh.tw:8000/Xuan/NLP/message/check/${type}/${stage}`,
         messagecheck
       );
       console.log('NLP server response:', response.data);
@@ -612,7 +612,7 @@ export const GroupChatRoom = ({ activityData }) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 border: '3px solid grey',
-                marginBottom: '10px',
+                // marginBottom: '10px',
                 borderRadius: 1,
               }}
             >
