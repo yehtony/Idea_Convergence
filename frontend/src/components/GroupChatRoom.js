@@ -29,83 +29,54 @@ import config from '../config.json';
 import { newMessage } from '../utils/ideaTool';
 
 export const GroupChatRoom = ({ activityData }) => {
-  const [type, setType] = useState('idea_convergent');
-  const [stage, setStage] = useState('stage_one');
+  const [type, setType] = useState(null);
+  const [typeMap, setTypeMap] = useState({
+    想法發散: 'idea_divergent',
+    想法收斂: 'idea_convergent',
+  });
+  const [stage, setStage] = useState('stage_zero');
   const [ws, setSocket] = useState(null);
   const [nodeData, setNodeData] = useState(null);
   const [topic, setTopic] = useState('');
-  const [activity, setActivity] = useState(activityData);
-  // const [summary, setSummary] = useState();
-  // const getNodes = async () => {
-  //   try {
-  //     const fetchData = await axios.get(
-  //       `${url.backendHost + config[8].getNode}/${localStorage.getItem(
-  //         'groupId'
-  //       )}`,
-  //       {
-  //         headers: {
-  //           authorization: 'Bearer JWT Token',
-  //         },
-  //       }
-  //     );
-  //     // const nodeData = fetchData.data.Nodes.map(
-  //     //   (node) => `${node.title}:${node.content}`
-  //     const nodeDataList = await fetchData.data.Nodes.map(
-  //       (node) => `${node.title}:${node.content}`
-  //     );
-  //     // console.log(nodeData);
-  //     setNodeData(nodeDataList);
-  //     console.log(nodeDataList);
-  //     // try {
-  //     //   const response = await axios.post(
-  //     //     'http://127.0.0.1:8000/nlp/idea/summarize',
-  //     //     {
-  //     //       message: nodeData,
-  //     //     }
-  //     //   );
-  //     //   console.log('NLP server response:', response.data);
-  //     //   // setSummary(response.data);
-  //     //   return response.data;
-  //     // } catch (error) {
-  //     //   console.error('Error sending message to NLP server:', error);
-  //     //   return false;
-  //     // }
-  //   } catch (error) {
-  //     console.error('Error fetching nodes:', error.message);
-  //   }
-  // };
-
+  // const [activity, setActivity] = useState(activityData);
   const userId = localStorage.getItem('userId');
   const author = localStorage.getItem('name');
   const groupId = localStorage.getItem('groupId');
-  // const ws = io.connect(url.backendHost);
   const [message, setMessage] = useState('');
+  // const [messageList, setMessageList] = useState([
+  //   {
+  //     content:
+  //       '看來你們需要進行想法收斂的 Meta-Talk，請你們進行小組討論並且摘要出你們在這個探究活動所提出的想法，並且在聊天室提出你們摘要後的想法。',
+  //     groupId: groupId,
+  //     author: 'assistant',
+  //   },
+  // ]);
   const [messageList, setMessageList] = useState([
     {
-      content:
-        '看來你們需要進行想法收斂的 Meta-Talk，請你們進行小組討論並且摘要出你們在這個探究活動所提出的想法，並且在聊天室提出你們摘要後的想法。',
+      content: '哈囉，請根據你們遇到的問題，點選想要進行的 Meta-talk 類型吧：',
       groupId: groupId,
       author: 'assistant',
+      button: ['想法發散', '想法收斂'],
     },
   ]);
   const [messageAlert, setMessageAlert] = useState([]);
   const [messageAlertCheck, setMessageAlertCheck] = useState(true);
-  const [alertMessage, setAlertMessage] = useState([
-    [
-      '你提出的想法似乎含有「冒犯性言論『',
-      '』」，如果可以請修正你的言論，以理性且尊種的方式表達想法喔！',
-    ],
-    [
-      '你提出的想法似乎含有「負面情緒」，建議你修正你的寫法為「',
-      '」，請以積極且正向的方式表達想法喔！',
-    ],
-    ['你提出的想法似乎和討論問題無關，請聚焦於問題並重新思考喔！', ''],
-  ]);
+  // const [alertMessage, setAlertMessage] = useState([
+  //   [
+  //     '你提出的想法似乎含有「冒犯性言論『',
+  //     '』」，如果可以請修正你的言論，以理性且尊種的方式表達想法喔！',
+  //   ],
+  //   [
+  //     '你提出的想法似乎含有「負面情緒」，建議你修正你的寫法為「',
+  //     '」，請以積極且正向的方式表達想法喔！',
+  //   ],
+  //   ['你提出的想法似乎和討論問題無關，請聚焦於問題並重新思考喔！', ''],
+  // ]);
   const [messageListTemp, setMessageListTemp] = useState({});
-  const [questionMessage, setQuestionMessage] = useState([
-    '哈囉各位同學，請問是你們主動想進行 Meta-Talk，還是老師需要你們進行 Meta-Talk 呢？',
-  ]);
-  const [checkGroupMessage, setCheckGroupMessage] = useState(false);
+  // const [questionMessage, setQuestionMessage] = useState([
+  //   '哈囉各位同學，請問是你們主動想進行 Meta-Talk，還是老師需要你們進行 Meta-Talk 呢？',
+  // ]);
+  const [checkGroupMessage, setCheckGroupMessage] = useState(true);
   const [chatRoomOpen, setChatRoomOpen] = useState(false);
   const [data, setData] = useState({
     userId: userId,
@@ -113,30 +84,26 @@ export const GroupChatRoom = ({ activityData }) => {
     author: author,
     content: message,
   });
-  const [sendActivityTitle, setSendActivityTitle] = useState(false);
-  const [scaffold, setScaffold] = useState(['我們摘要出的想法：']);
+  // const [sendActivityTitle, setSendActivityTitle] = useState(false);
+  const [scaffold, setScaffold] = useState('');
   const buttonGroupRef = useRef(null);
   const [buttonGroupHeight, setButtonGroupHeight] = useState(0);
 
+  const handlTypeChoose = async (buttonTitle) => {
+    setType(typeMap[buttonTitle]);
+    setCheckGroupMessage(true);
+  };
+
+  useEffect(() => {
+    if (type != null) if (checkGroupMessage === true) sendGroupMessage();
+  }, [type]);
+
   // Group Message
   const sendGroupMessage = async () => {
+    console.log('Sending group message');
+    console.log(type);
+    console.log(checkGroupMessage);
     console.log(messageListTemp);
-    // var messageTitleNode;
-    if (sendActivityTitle === false) {
-      // setMessageListTemp((prev) => ({
-      //   ...prev,
-      //   message: prev.message + '|' + activityData.title + '|' + nodeData,
-      // }));
-      // messageTitleNode = {
-      //   sender: messageListTemp.sender,
-      //   message:
-      //     messageListTemp.message + '//' + activityData.title + '//' + summary,
-      // };
-      // setSendActivityTitle(true);
-    } else {
-      // messageTitleNode = messageListTemp;
-    }
-    // console.log(messageListTemp);
     if (checkGroupMessage === true) {
       try {
         const response = await axios.post(
@@ -146,41 +113,35 @@ export const GroupChatRoom = ({ activityData }) => {
 
         console.log('NLP server response:', response.data);
         let messageData;
-        if (response.data.button && response.data.button.length > 0) {
-          const buttonTitles = response.data.button.map((button) => button);
-          setScaffold(buttonTitles);
+        if (response.data.scaffold && response.data.scaffold.length > 0) {
+          const scaffoldTitles = response.data.scaffold.map(
+            (scaffold) => scaffold
+          );
+          // setScaffold(scaffoldTitles);
           messageData = {
             userId: data.userId,
             groupId: groupId,
             author: 'assistant',
             content: response.data.message,
-            button: buttonTitles,
+            scaffold: response.data.scaffold,
+            button: response.data.button,
             type: response.data.type,
             stage: response.data.stage,
           };
-          // console.log(messageData.buttons);
         } else {
-          setScaffold([]);
+          // setScaffold([]);
           messageData = {
             userId: data.userId,
             groupId: groupId,
             author: 'assistant',
             content: response.data.message,
+            button: response.data.button,
             type: response.data.type,
             stage: response.data.stage,
           };
-          // console.log(messageData);
         }
-        // setCheckGroupMessage(false);
-        // socket.emit('sendMessage', messageData);
         console.log('send message', messageData);
         newMessage(messageData, ws);
-        // setMessageList((prev) => [...prev, messageData]);
-        // setMessageListTemp({
-        //   // sender: groupId,
-        //   topic: topic,
-        //   message: '',
-        // });
         return response.data;
       } catch (error) {
         console.error('Error sending message to NLP server:', error);
@@ -192,23 +153,6 @@ export const GroupChatRoom = ({ activityData }) => {
 
   // Check Personal Message
   const checkMessage = async () => {
-    // console.log(messageList);
-    // const messageqa = questionMessage.concat(message);
-    // console.log(messageqa);
-    // try {
-    //   const response = await axios.post(
-    //     `http://ml.hsueh.tw:8000/Xuan/NLP/message/check`,
-    //     {
-    //       message: messageqa,
-    //     }
-    //   );
-    //   console.log('NLP server response:', response.data);
-    //   return response.data;
-    // } catch (error) {
-    //   console.error('Error sending message to NLP server:', error);
-    //   return false;
-    // }
-
     const messagecheck = {
       message: message,
       topic: topic,
@@ -240,30 +184,13 @@ export const GroupChatRoom = ({ activityData }) => {
           author: data.author,
           content: message,
         };
-        // socket.emit('sendMessage', messageData);
         console.log('send message', messageData);
         newMessage(messageData, ws);
-        // setMessageList((prev) => [...prev, messageData]);
-        // setMessageListTemp((prev) => ({
-        //   ...prev,
-        //   message: prev.message + message,
-        // }));
-        // setMessageAlertCheck(true);
-        // setCheckGroupMessage(true);
-        // console.log(messageListTemp)
         setMessage('');
       } else {
-        // checkMessageResult.forEach((item, index) => {
-        //   if (item.check) {
-        //     setMessageAlert((prev) => [...prev, item.message]);
-        //     // console.log(messageAlert);
-        //   }
-        // });
         setMessageAlert((prev) => [...prev, checkMessageResult.message]);
-
         console.log(checkMessageResult);
         setMessageAlertCheck(false);
-        // setMessageAlert(messageToAlert);
         console.log('send message', messageAlert);
       }
     }
@@ -273,17 +200,14 @@ export const GroupChatRoom = ({ activityData }) => {
     setSocket(io.connect(url.socketioHost));
     async function getNode() {
       await getNodes();
-      // setSocket(io.connect(url.socketioHost));
     }
     getNode();
   }, []);
 
   useEffect(() => {
     if (nodeData) {
-      // setTopic(activityData.title);
       setMessageListTemp((prev) => ({
         ...prev,
-        // sender: groupId,
         idea: nodeData,
       }));
       console.log(activityData.title);
@@ -322,18 +246,11 @@ export const GroupChatRoom = ({ activityData }) => {
     if (activityData) {
       setTopic(activityData.title);
       console.log('initWebSocket');
-      // setTopic(activityData.title);
       setMessageListTemp((prev) => ({
         ...prev,
         topic: activityData.title,
         message: '',
       }));
-      // setMessageListTemp({
-      //   // sender: groupId,
-      //   topic: activityData.title,
-      //   message: '',
-      //   idea: nodeData,
-      // });
       const receive_message = async (data) => {
         setMessageList((prev) => [...prev, data]);
         if (data.author !== 'assistant') {
@@ -348,8 +265,8 @@ export const GroupChatRoom = ({ activityData }) => {
             message: '',
           }));
           console.log(data);
-          if (data.button) {
-            setScaffold(data.button);
+          if (data.scaffold) {
+            setScaffold(data.scaffold);
             if (buttonGroupRef.current) {
               const height = buttonGroupRef.current.clientHeight;
               setButtonGroupHeight(height);
@@ -357,13 +274,12 @@ export const GroupChatRoom = ({ activityData }) => {
           } else {
             setScaffold([]);
           }
-          setQuestionMessage([data.message]);
+          // setQuestionMessage([data.message]);
           setCheckGroupMessage(false);
           setType(data.type);
           setStage(data.stage);
         }
-        // setCheckGroupMessage(true);
-        setSendActivityTitle(true);
+        // setSendActivityTitle(true);
       };
       ws.on(`message-receive-${groupId}`, receive_message);
     }
@@ -376,9 +292,6 @@ export const GroupChatRoom = ({ activityData }) => {
     }
   }, [chatRoomOpen]);
 
-  // const handleClickOpen = () => {
-  //   setCheckGroupMessage(true);
-  // };
   useEffect(() => {
     if (buttonGroupRef.current) {
       const height = buttonGroupRef.current.clientHeight;
@@ -390,7 +303,6 @@ export const GroupChatRoom = ({ activityData }) => {
     setMessage(e + message);
   };
   const doubleCheckYes = () => {
-    // setCheckGroupMessage(true);
     setMessageAlertCheck(true);
     setMessageAlert([]);
     const messageData = {
@@ -399,14 +311,7 @@ export const GroupChatRoom = ({ activityData }) => {
       author: data.author,
       content: message,
     };
-    // socket.emit('sendMessage', messageData);
-    // console.log('send message', messageData);
     newMessage(messageData, ws);
-    // setMessageList((prev) => [...prev, messageData]);
-    // setMessageListTemp((prev) => ({
-    //   ...prev,
-    //   message: prev.message + '\n' + message,
-    // }));
     setMessage('');
   };
   const doubleCheckNo = () => {
@@ -419,7 +324,6 @@ export const GroupChatRoom = ({ activityData }) => {
     <>
       <Dialog
         open={messageAlertCheck === false}
-        // onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -557,6 +461,38 @@ export const GroupChatRoom = ({ activityData }) => {
                             <br />
                           </React.Fragment>
                         ))}
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                          // // alignItems: 'center', // This will vertically center the items
+                          // // width: '100%', // Ensures the container takes the full width
+                          // marginRight: '10px' // Adds padding at the top and bottom for spacing
+                        }}
+                      >
+                        {message.button &&
+                          message.button.map((btn, btnIndex) => (
+                            <Button
+                              color="primary"
+                              variant="outlined"
+                              key={btnIndex}
+                              style={{
+                                backgroundColor: 'white',
+                                border: '2px solid',
+                                marginTop: '5px',
+                                marginBottom: '2px',
+                                marginRight:
+                                  btnIndex === message.button.length - 1
+                                    ? '0'
+                                    : '5px', // 除了最后一个按钮外，其他按钮右侧加10px边距
+                                padding: '3px 10px',
+                              }}
+                              onClick={() => handlTypeChoose(btn)}
+                            >
+                              {btn}
+                            </Button>
+                          ))}
+                      </div>
                     </div>
                     {message.author}
                   </ListItem>
@@ -577,8 +513,6 @@ export const GroupChatRoom = ({ activityData }) => {
                 aria-label="Basic button group"
                 style={{
                   width: '98%',
-                  // margin: '7px',
-                  // border: '3px solid',
                   height: 'fit-content',
                   display: 'flex', // 添加这行样式
                   flexWrap: 'wrap', // 添加这行样式
@@ -592,7 +526,6 @@ export const GroupChatRoom = ({ activityData }) => {
                       key={index}
                       onClick={() => handleScaffoldClick(value)}
                       style={{
-                        // width: '100%',
                         border: '2px solid',
                         borderRadius: '20px',
                         marginLeft: '5px',
@@ -612,7 +545,6 @@ export const GroupChatRoom = ({ activityData }) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 border: '3px solid grey',
-                // marginBottom: '10px',
                 borderRadius: 1,
               }}
             >
