@@ -29,15 +29,16 @@ import config from '../config.json';
 import { newMessage } from '../utils/ideaTool';
 
 export const GroupChatRoom = ({ activityData }) => {
-  const [type, setType] = useState(null);
-  const [typeMap, setTypeMap] = useState({
-    想法發散: 'idea_divergent',
-    想法收斂: 'idea_convergent',
-  });
+  const [type, setType] = useState('type_choose');
+  // const [typeMap, setTypeMap] = useState({
+  //   想法發散: 'idea_divergent',
+  //   想法收斂: 'idea_convergent',
+  // });
   const [stage, setStage] = useState('stage_zero');
   const [ws, setSocket] = useState(null);
   const [nodeData, setNodeData] = useState(null);
   const [topic, setTopic] = useState('');
+  // const [buttonChoice, setButtonChoice] = useState();
   // const [activity, setActivity] = useState(activityData);
   const userId = localStorage.getItem('userId');
   const author = localStorage.getItem('name');
@@ -76,7 +77,7 @@ export const GroupChatRoom = ({ activityData }) => {
   // const [questionMessage, setQuestionMessage] = useState([
   //   '哈囉各位同學，請問是你們主動想進行 Meta-Talk，還是老師需要你們進行 Meta-Talk 呢？',
   // ]);
-  const [checkGroupMessage, setCheckGroupMessage] = useState(true);
+  const [checkGroupMessage, setCheckGroupMessage] = useState(false);
   const [chatRoomOpen, setChatRoomOpen] = useState(false);
   const [data, setData] = useState({
     userId: userId,
@@ -90,19 +91,27 @@ export const GroupChatRoom = ({ activityData }) => {
   const [buttonGroupHeight, setButtonGroupHeight] = useState(0);
 
   const handlTypeChoose = async (buttonTitle) => {
-    setType(typeMap[buttonTitle]);
+    // setButtonChoice(buttonTitle);
+    setMessageListTemp((prev) => ({
+      ...prev,
+      buttonChoice: buttonTitle,
+    }));
+    // setType(typeMap[buttonTitle]);
     setCheckGroupMessage(true);
   };
 
   useEffect(() => {
-    if (type != null) if (checkGroupMessage === true) sendGroupMessage();
-  }, [type]);
+    if (messageListTemp.buttonChoice !== "empty")
+      if (checkGroupMessage === true) {
+        sendGroupMessage();
+      }
+  }, [messageListTemp.buttonChoice]);
 
   // Group Message
   const sendGroupMessage = async () => {
     console.log('Sending group message');
     console.log(type);
-    console.log(checkGroupMessage);
+    // console.log(checkGroupMessage);
     console.log(messageListTemp);
     if (checkGroupMessage === true) {
       try {
@@ -110,38 +119,48 @@ export const GroupChatRoom = ({ activityData }) => {
           `http://ml.hsueh.tw:8000/Xuan/NLP/${type}/${stage}`,
           messageListTemp
         );
-
         console.log('NLP server response:', response.data);
-        let messageData;
-        if (response.data.scaffold && response.data.scaffold.length > 0) {
-          const scaffoldTitles = response.data.scaffold.map(
-            (scaffold) => scaffold
-          );
-          // setScaffold(scaffoldTitles);
-          messageData = {
-            userId: data.userId,
-            groupId: groupId,
-            author: 'assistant',
-            content: response.data.message,
-            scaffold: response.data.scaffold,
-            button: response.data.button,
-            type: response.data.type,
-            stage: response.data.stage,
-          };
-        } else {
-          // setScaffold([]);
-          messageData = {
-            userId: data.userId,
-            groupId: groupId,
-            author: 'assistant',
-            content: response.data.message,
-            button: response.data.button,
-            type: response.data.type,
-            stage: response.data.stage,
-          };
+        // let messageData;
+        // if (response.data.scaffold && response.data.scaffold.length > 0) {
+        // const scaffoldTitles = response.data.scaffold.map(
+        //   (scaffold) => scaffold
+        // );
+        // setScaffold(scaffoldTitles);
+        async function sendMessagesSequentially(messages) {
+          for (const message of messages) {
+            await newMessage(message, ws);
+            console.log('Message sent:', message);
+          }
         }
-        console.log('send message', messageData);
-        newMessage(messageData, ws);
+
+        const messages = response.data.message.map((messageContent, index) => ({
+          userId: data.userId,
+          groupId: groupId,
+          author: 'assistant',
+          content: messageContent,
+          scaffold: response.data.scaffold,
+          button: response.data.button[index],
+          type: response.data.type,
+          stage: response.data.stage,
+        }));
+
+        sendMessagesSequentially(messages);
+        // } else {
+        //   // setScaffold([]);
+        //   response.data.message.forEach((messageContent) => {
+        //     let messageData = {
+        //       userId: data.userId,
+        //       groupId: groupId,
+        //       author: 'assistant',
+        //       content: messageContent,
+        //       button: response.data.button[index],
+        //       type: response.data.type,
+        //       stage: response.data.stage,
+        //     };
+        //     console.log('send message', messageData);
+        //     newMessage(messageData, ws);
+        //   });
+        // }
         return response.data;
       } catch (error) {
         console.error('Error sending message to NLP server:', error);
@@ -249,21 +268,27 @@ export const GroupChatRoom = ({ activityData }) => {
       setMessageListTemp((prev) => ({
         ...prev,
         topic: activityData.title,
-        message: '',
+        message: [],
       }));
       const receive_message = async (data) => {
         setMessageList((prev) => [...prev, data]);
         if (data.author !== 'assistant') {
           setMessageListTemp((prev) => ({
             ...prev,
-            message: prev.message + '\n' + data.content,
+            message: [...prev.message, data.content],
           }));
           setCheckGroupMessage(true);
         } else {
           setMessageListTemp((prev) => ({
             ...prev,
-            message: '',
+            buttonChoice: "empty",
           }));
+          if (data.clear === true) {
+            setMessageListTemp((prev) => ({
+              ...prev,
+              message: [],
+            }));
+          }
           console.log(data);
           if (data.scaffold) {
             setScaffold(data.scaffold);
@@ -328,7 +353,7 @@ export const GroupChatRoom = ({ activityData }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {'是否要提出此想法？'}
+          {'是否要重新提出想法？'}
         </DialogTitle>
         <DialogContent>
           {messageAlert.map((content, index) => (
@@ -340,11 +365,11 @@ export const GroupChatRoom = ({ activityData }) => {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" onClick={doubleCheckNo}>
-            否
-          </Button>
-          <Button variant="contained" onClick={doubleCheckYes} autoFocus>
+          <Button variant="contained" onClick={doubleCheckNo}>
             是
+          </Button>
+          <Button variant="outlined" onClick={doubleCheckYes} autoFocus>
+            否
           </Button>
         </DialogActions>
       </Dialog>
